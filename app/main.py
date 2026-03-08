@@ -84,6 +84,7 @@ def create_app() -> FastAPI:
         "/api/v1/schedule",
         "/api/v1/drafts",
         "/api/v1/notifications",
+        "/api/v1/bhashini",
     ])
 
     class TrailingSlashMiddleware:
@@ -153,6 +154,7 @@ def create_app() -> FastAPI:
     from app.api.v1.notifications import router as notifications_router
     from app.api.v1.schedule import router as schedule_router
     from app.api.v1.drafts import router as drafts_router
+    from app.api.v1.bhashini import router as bhashini_router
 
     app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
     app.include_router(citizens_router, prefix="/api/v1/citizens", tags=["Citizens"])
@@ -170,6 +172,7 @@ def create_app() -> FastAPI:
     app.include_router(notifications_router, prefix="/api/v1/notifications", tags=["Notifications"])
     app.include_router(schedule_router, prefix="/api/v1/schedule", tags=["Schedule"])
     app.include_router(drafts_router, prefix="/api/v1/drafts", tags=["Drafts"])
+    app.include_router(bhashini_router, prefix="/api/v1/bhashini", tags=["Bhashini"])
 
     return app
 

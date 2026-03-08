@@ -2,7 +2,7 @@
 
 > **AI Co-Pilot Platform for Public Leaders & Municipal Administrators**
 >
-> Version 2.0.0 | Python 3.13 | FastAPI 0.104 | Next.js 16 | Groq LLM | TF-IDF RAG | Whisper STT
+> Version 2.0.0 | Python 3.13 | FastAPI 0.104 | Next.js 16 | Groq LLM | TF-IDF RAG | Whisper STT | Bhashini Dhruva API
 
 ---
 
@@ -30,6 +30,7 @@
    - 4.7 [Agent Orchestration](#47-agent-orchestration)
    - 4.8 [Speech-to-Text (STT) Pipeline](#48-speech-to-text-stt-pipeline)
    - 4.9 [AI Draft Generator](#49-ai-draft-generator)
+   - 4.10 [Bhashini Language Services](#410-bhashini-language-services)
 5. [Human-in-the-Loop (HITL) Approval System](#5-human-in-the-loop-hitl-approval-system)
 6. [Frontend Implementation](#6-frontend-implementation)
    - 6.1 [Technology Stack](#61-technology-stack)
@@ -61,7 +62,7 @@
 1. **AI-Augmented, Not AI-Autonomous** — Every AI-proposed action requires explicit human approval (Human-in-the-Loop). The system advises; humans decide.
 2. **Multi-Agent Specialization** — Three domain-specific agents (Policy, Citizen, Operations) each trained with contextual prompts and routed via intent classification.
 3. **Document-Grounded Intelligence** — All LLM responses are grounded in uploaded governance documents via RAG, reducing hallucination and improving factual accuracy.
-4. **Voice-First Accessibility** — Fully implemented STT pipeline (Groq Whisper → local faster-whisper → OpenAI) enables voice input for queries, document creation, and issue filing.
+4. **Voice-First Accessibility** — Fully implemented STT pipeline (Groq Whisper -> local faster-whisper -> OpenAI) and Bhashini Dhruva API integration for 12+ Indian languages enables voice input for queries, document creation, and issue filing in any supported Indian language.
 5. **AI Content Generation** — LLM-powered draft generator produces 9 types of government documents (speeches, responses, circulars, etc.) with template prompts, tone/audience control, and versioned editing.
 6. **Enterprise-Grade Security** — JWT authentication, role-based access control (RBAC), per-IP rate limiting, structured audit logging, and encrypted PII fields.
 
@@ -75,6 +76,9 @@
 | **AI Chat** | Natural language queries answered by specialized agents with document-grounded responses |
 | **HITL Approvals** | Review, approve, or reject every AI-proposed action before execution |
 | **Speech-to-Text** | Multi-provider STT pipeline: transcribe, classify content type, and intelligently ingest voice into the platform |
+| **Bhashini Language Services** | Full Bhashini Dhruva API integration: ASR, TTS, neural machine translation, hybrid LLM + keyword text classification, and summarization for 12+ Indian languages |
+| **Voice Intelligence** | Record voice in any Indian language, auto-classify as question/issue/document via hybrid classifier, and route to the appropriate action |
+| **Multi-Language Issue Creation** | File grievances via voice in any Indian language with Bhashini ASR and optional auto-translation to English |
 | **AI Draft Generator** | LLM-powered generation of 9 document types with template system prompts, tone/audience controls, versioned editing, and publish workflow |
 | **Schedule Management** | Full calendar/event system with 7 event types, 3 priority levels, status lifecycle, department/ward assignment, and 48-hour smart notifications |
 | **Smart Notifications** | Aggregated feed from 4 sources: pending approvals, high-priority issues, recent documents, upcoming events |
@@ -117,11 +121,11 @@
 │  │  │ CORS → TrailingSlash → RateLimit → RequestLogging  │  │   │
 │  │  └────────────────────────────────────────────────────┘  │   │
 │  │                                                           │   │
-│  │  12 API Routers + 4 New Routers = 16 Total:                │   │
+│  │  12 API Routers + 5 New Routers = 17 Total:                │   │
 │  │  auth │ citizens │ issues │ documents │ dashboard        │   │
 │  │  agent │ actions │ stt │ notifications │ schedule        │   │
 │  │  drafts │ sync │ offline │ compliance │ monitoring       │   │
-│  │  hardening                                                │   │
+│  │  hardening │ bhashini                                      │   │
 │  │                                                           │   │
 │  │  Service Layer → Repository Layer → SQLAlchemy ORM       │   │
 │  └───────────────────────────────────────────────────────────┘   │
@@ -144,8 +148,14 @@
 │  │  └─────────────────────────────────────────────────┘     │   │
 │  │                                                           │   │
 │  │  ┌─── STT Pipeline (Fully Implemented) ────────────┐     │   │
-│  │  │ Mic → Audio → Groq Whisper / faster-whisper      │     │   │
-│  │  │ Transcript → Classify → Ingest → RAG Store       │     │   │
+│  │  │ Mic -> Audio -> Groq Whisper / faster-whisper     │     │   │
+│  │  │ Transcript -> Classify -> Ingest -> RAG Store     │     │   │
+│  │  └─────────────────────────────────────────────────┘     │   │
+│  │                                                           │   │
+│  │  ┌─── Bhashini Dhruva API ─────────────────────────┐     │   │
+│  │  │ ASR / TTS / NMT / Classify / Summarize           │     │   │
+│  │  │ 12+ Indian Languages (Hindi, Tamil, Bengali...)   │     │   │
+│  │  │ Hybrid LLM + Keyword Classification Fallback      │     │   │
 │  │  └─────────────────────────────────────────────────┘     │   │
 │  └───────────────────────────────────────────────────────────┘   │
 └─────────────────────────────┬───────────────────────────────────┘
@@ -189,7 +199,7 @@ The application factory creates a FastAPI instance with:
 4. **Request Logging Middleware** — X-Request-ID correlation for distributed tracing
 5. **Structured Logging** — JSON output in production via structlog
 
-**Router Registration** — 16 API routers are mounted under `/api/v1/`:
+**Router Registration** -- 17 API routers are mounted under `/api/v1/`:
 
 ```python
 app.include_router(auth.router,          prefix="/api/v1/auth",          tags=["Authentication"])
@@ -208,6 +218,7 @@ app.include_router(offline.router,       prefix="/api/v1/offline",       tags=["
 app.include_router(compliance.router,    prefix="/api/v1/compliance",    tags=["Compliance"])
 app.include_router(monitoring.router,    prefix="/api/v1/monitoring",    tags=["Monitoring"])
 app.include_router(hardening.router,     prefix="/api/v1/hardening",     tags=["Hardening"])
+app.include_router(bhashini.router,     prefix="/api/v1/bhashini",     tags=["Bhashini"])
 ```
 
 **Startup Events:**
@@ -927,6 +938,85 @@ GENERATING → DRAFT → UNDER_REVIEW → APPROVED → PUBLISHED
 
 Each content edit auto-increments the `version` integer for audit tracking.
 
+### 4.10 Bhashini Language Services
+
+**Files:** `app/services/bhashini.py` | `app/schemas/bhashini.py` | `app/api/v1/bhashini.py`
+
+Full integration with the Bhashini Dhruva API (`dhruva-api.bhashini.gov.in`) for Indian language AI services. Supports 12+ Indian languages including Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, and Urdu.
+
+#### Service Layer (`app/services/bhashini.py`)
+
+The `BhashiniService` class provides:
+
+| Method | Description |
+|--------|-------------|
+| `asr()` | Speech-to-text via Bhashini ASR pipeline for Indian languages |
+| `tts()` | Text-to-speech with male/female voice selection |
+| `translate()` | Neural machine translation between any supported language pair |
+| `asr_translate()` | Compound: transcribe audio then translate to target language |
+| `classify_text()` | Hybrid LLM + keyword text classification (question/issue/document) |
+| `summarize_text()` | LLM-powered summarization with key points and action items |
+| `get_supported_languages()` | Returns supported languages per task type |
+| `health_check()` | Verifies Bhashini API connectivity |
+
+#### Text Classification -- Dual Strategy
+
+The `classify_text()` method implements a **hybrid classification** approach:
+
+1. **LLM Classification (primary):** Groq Llama 3.3 analyzes text and returns category, confidence, reasoning, and extracted metadata (department, priority, citizen name).
+2. **Keyword Classifier (fallback and cross-validator):** Rule-based classifier (`_keyword_classify()`) with 90+ Hindi and English governance keywords across three categories:
+   - **Question keywords** (~30 words): "kya", "kaise", "status", "what", "how", etc.
+   - **Issue keywords** (~35 words): "samasya", "shikayat", "pothole", "bijli nahi", "naali", etc.
+   - **Document keywords** (~30 words): "baithak", "karyavahi", "minutes", "agenda", "budget", etc.
+
+**Cross-validation logic:**
+- Both classifiers always run in parallel
+- If LLM confidence < 65%, the keyword result overrides when it scores higher
+- On LLM failure, keyword classifier provides immediate fallback
+- Question-mark presence in text receives a scoring boost
+
+#### API Endpoints
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/v1/bhashini/asr` | POST | Speech-to-text for Indian languages (multipart audio) |
+| `/api/v1/bhashini/tts` | POST | Text-to-speech with voice selection |
+| `/api/v1/bhashini/translate` | POST | Neural machine translation |
+| `/api/v1/bhashini/asr-translate` | POST | Compound ASR + translation |
+| `/api/v1/bhashini/classify-text` | POST | Hybrid LLM + keyword text classification |
+| `/api/v1/bhashini/summarize` | POST | Text summarization with key points |
+| `/api/v1/bhashini/languages` | GET | Supported languages per task |
+| `/api/v1/bhashini/health` | GET | Bhashini API connectivity check |
+
+#### Voice Intelligence Pipeline
+
+```
+Record Audio (any Indian language)
+       |
+       v
+  Bhashini ASR (language-aware)
+       |
+       v
+  Hybrid Classification (LLM + Keywords)
+       |
+       +--> "question"  -> Route to AI Agent
+       +--> "issue"     -> Create Issue (with citizen picker)
+       +--> "document"  -> Save as Document
+       |
+       v
+  Optional: Summarize (key points, action items, departments)
+```
+
+#### Frontend Integration
+
+Bhashini language services are integrated across three frontend pages:
+
+| Page | Integration |
+|------|-------------|
+| **Bhashini** (`/bhashini`) | Voice Intelligence tab (record, ASR, classify, act), Text-to-Speech tab, Translation tab |
+| **Documents** (`/documents`) | Language selector + Bhashini ASR for voice ingest with classification |
+| **Issues** (`/issues`) | Create Issue form with voice recording, Bhashini ASR, and translate-to-English |
+
 ---
 
 ## 5. Human-in-the-Loop (HITL) Approval System
@@ -1000,8 +1090,8 @@ PENDING ──▶ APPROVED ──▶ (Action Executed)
 | **Dashboard** | `/` | Total issues, citizens, documents; department breakdown; status distribution; recent documents |
 | **Citizens** | `/citizens` | Paginated citizen list with ward filter; create/edit dialogs |
 | **Issues** | `/issues` | Issue list with status/priority/department filters; create with citizen selector; status updates |
-| **Documents** | `/documents` | Document list with file upload dialog; shows extracted text + AI summary; supports PDF/DOCX/TXT; 🎤 voice recording |
-| **Intelligence** | `/intelligence` | AI chat interface; session management; agent selector; real-time streaming responses; 🎤 voice input |
+| **Documents** | `/documents` | Document list with file upload dialog; shows extracted text + AI summary; supports PDF/DOCX/TXT; Bhashini ASR voice ingest with 12-language selector |
+| **Intelligence** | `/intelligence` | AI chat interface; session management; agent selector; real-time streaming responses; voice input |
 | **Schedule** | `/schedule` | Calendar event management; stats cards (upcoming/today/high priority); filters (type/status/department); event CRUD with detail dialog; status workflow (Start/Complete/Cancel) |
 | **Drafts** | `/drafts` | AI draft generation; 9 template quick-generate cards; stats (total/AI-generated/under review); generate dialog with tone/audience/context; view/edit with version tracking; copy to clipboard; publish workflow |
 | **Approvals** | `/approvals` | Pending action requests; approve/reject with notes; status badges (PENDING/APPROVED/REJECTED) |
@@ -1009,6 +1099,8 @@ PENDING ──▶ APPROVED ──▶ (Action Executed)
 | **Predictive** | `/predictive` | 4-week forecast chart; anomaly detection (high-priority issues); ward trend lines |
 | **Compliance** | `/compliance` | Audit trail viewer; export functionality |
 | **Monitoring** | `/monitoring` | System health; API metrics; uptime status |
+| **Issues** | `/issues` | Issue list with status/priority/department filters; create with citizen selector; voice-based issue creation with Bhashini ASR and translate-to-English |
+| **Bhashini** | `/bhashini` | Voice Intelligence (record, classify, route to action); Text-to-Speech with voice selection; Neural machine translation between language pairs |
 | **Settings** | `/settings` | User profile management; theme preferences |
 
 ### 6.3 API Integration Layer
@@ -1294,6 +1386,19 @@ An aggregated notification feed that pulls from 4 real-time data sources:
 | `/api/v1/stt/transcribe` | POST | Any | `multipart/form-data {file}` | `{transcript, language, duration, provider}` |
 | `/api/v1/stt/classify` | POST | Any | `multipart/form-data {file}` | `{transcript, language, duration, classification}` |
 | `/api/v1/stt/ingest` | POST | Leader, Staff | `multipart/form-data {file, mode?}` | `{transcript, classification, created_entity, rag_indexed}` |
+
+### Bhashini Language Services
+
+| Endpoint | Method | Auth | Body | Response |
+|----------|--------|------|------|----------|
+| `/api/v1/bhashini/asr` | POST | Any | `multipart/form-data {file, language}` | `{text, language, duration}` |
+| `/api/v1/bhashini/tts` | POST | Any | `{text, language, gender}` | `{audio_base64, language, gender}` |
+| `/api/v1/bhashini/translate` | POST | Any | `{text, source_language, target_language}` | `{translated_text, source_language, target_language}` |
+| `/api/v1/bhashini/asr-translate` | POST | Any | `multipart/form-data {file, source_language, target_language}` | `{text, translated_text, source_language, target_language}` |
+| `/api/v1/bhashini/classify-text` | POST | Any | `{text, source_language?}` | `{category, confidence, reasoning, metadata, method}` |
+| `/api/v1/bhashini/summarize` | POST | Any | `{text, source_language?}` | `{summary, key_points[], action_items[], departments[]}` |
+| `/api/v1/bhashini/languages` | GET | Any | -- | `{asr: [], tts: [], translation: []}` |
+| `/api/v1/bhashini/health` | GET | Any | -- | `{status, response_time_ms}` |
 
 ### Schedule Management
 

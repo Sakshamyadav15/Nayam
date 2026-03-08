@@ -1,6 +1,6 @@
 <p align="center">
-  <h1 align="center">NAYAM (नयम्)</h1>
-  <p align="center"><strong>AI Co-Pilot Platform for Public Leaders & Municipal Administrators</strong></p>
+  <h1 align="center">NAYAM</h1>
+  <p align="center"><strong>AI Co-Pilot Platform for Public Leaders and Municipal Administrators</strong></p>
 </p>
 
 <p align="center">
@@ -9,135 +9,132 @@
   <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" />
   <img src="https://img.shields.io/badge/LLM-Groq%20Llama%203.3-orange" />
   <img src="https://img.shields.io/badge/RAG-TF--IDF-green" />
-  <img src="https://img.shields.io/badge/STT-Whisper-blueviolet" />
-  <img src="https://img.shields.io/badge/Routers-16-blue" />
+  <img src="https://img.shields.io/badge/STT-Whisper%20%2B%20Bhashini-blueviolet" />
+  <img src="https://img.shields.io/badge/Bhashini-Dhruva%20API-ff6600" />
+  <img src="https://img.shields.io/badge/API%20Routers-17-blue" />
+  <img src="https://img.shields.io/badge/Routes-82-blue" />
   <img src="https://img.shields.io/badge/Tests-518%20passing-brightgreen" />
 </p>
 
 ---
 
-## What is NAYAM?
+## Overview
 
-NAYAM is an **AI-powered governance platform** that helps municipal leaders, staff, and analysts manage citizens, grievances, policy documents, schedules, and administrative workflows through an intelligent multi-agent system with speech-to-text input, AI draft generation, and smart notifications.
+NAYAM is an AI-powered governance platform designed to serve as an intelligent co-pilot for municipal leaders, administrative staff, and data analysts. It provides a unified interface for managing citizens, grievances, policy documents, schedules, and administrative workflows -- backed by a multi-agent LLM system, a Retrieval-Augmented Generation (RAG) pipeline, multi-provider speech-to-text, Bhashini Gov India language services, AI-powered document drafting, and a real-time notification engine.
 
-**Core capabilities:**
+### Key Capabilities
 
-- 🤖 **Multi-Agent Intelligence** — 3 specialized AI agents (Policy, Citizen, Operations) powered by Groq LLM with intent-based routing
-- 📄 **Document RAG Pipeline** — Upload PDF/DOCX/TXT → text extraction → chunking → TF-IDF retrieval → LLM-grounded answers
-- 🎤 **Speech-to-Text Pipeline** — Fully implemented multi-provider STT: Groq Whisper (primary) → local faster-whisper (offline fallback) → OpenAI (last resort). Transcribe, classify, and ingest voice into RAG
-- ✍️ **AI Draft Generator** — LLM-powered generation of 9 document types (Speeches, Official Responses, Press Releases, Policy Briefs, Meeting Agendas, Public Notices, Letters, RTI Responses, Circulars) with template system prompts, tone/audience control, and versioned editing
-- 📅 **Schedule Management** — Full calendar/event system for leaders: meetings, hearings, site visits, deadlines, reviews, public events with priority levels, status lifecycle, and department/ward assignment
-- 🔔 **Smart Notifications** — Aggregated notification feed pulling from pending approvals, high-priority issues, recent documents, and upcoming events (48-hour lookahead)
-- ✅ **Human-in-the-Loop Approvals** — Every AI-proposed action requires explicit human approval before execution
-- 📊 **Real-time Analytics** — Ward-level risk scoring, predictive insights, geo-spatial intelligence
-- 🔒 **Enterprise Security** — JWT auth, RBAC (Leader/Staff/Analyst), rate limiting, audit logging
+| Capability | Description |
+|---|---|
+| **Multi-Agent Intelligence** | Three domain-specific AI agents (Policy, Citizen, Operations) powered by Groq LLM with keyword-scored intent routing |
+| **Document RAG Pipeline** | Upload PDF/DOCX/TXT; automatic text extraction, chunking, TF-IDF indexing, and LLM-grounded retrieval |
+| **Speech-to-Text Pipeline** | Multi-provider STT with automatic fallback: Groq Whisper, local faster-whisper (offline), OpenAI Whisper. Supports transcription, content classification, and intelligent entity ingestion |
+| **Bhashini Language Services** | Full integration with Bhashini Dhruva API for 12+ Indian languages: ASR (speech-to-text), TTS (text-to-speech), neural machine translation, LLM-powered text classification (question/issue/document), and text summarization with keyword-based fallback |
+| **Voice Intelligence** | Record voice in any supported Indian language, auto-classify as question/issue/document via hybrid LLM + keyword classifier, and route to the appropriate action |
+| **AI Draft Generator** | LLM-powered generation of nine formal document types with template system prompts, tone and audience controls, and versioned editing with publish workflow |
+| **Schedule Management** | Calendar and event system supporting seven event types, three priority levels, status lifecycle tracking, and department/ward assignment |
+| **Notification System** | Aggregated feed from four real-time sources: pending approvals, high-priority issues, recent documents, and upcoming events (48-hour lookahead) |
+| **Multi-Language Issue Creation** | File grievances via voice in any Indian language with Bhashini ASR, with optional auto-translation to English via neural machine translation |
+| **Human-in-the-Loop Approvals** | Every AI-proposed mutation requires explicit human authorization before execution |
+| **Analytics and Predictive Intelligence** | Ward-level risk scoring, geo-spatial heatmaps, four-week trend forecasting, and anomaly detection |
+| **Enterprise Security** | JWT authentication, role-based access control (Leader/Staff/Analyst), per-IP rate limiting, structured audit logging |
 
 ---
 
-## Architecture
+## System Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                    FRONTEND (Next.js 16)                     │
-│  Dashboard │ Issues │ Citizens │ Documents │ Intelligence    │
-│  Schedule │ Drafts │ Approvals │ Geo-Analytics │ Predictive │
-│  Compliance │ Monitoring │ Settings │ Notifications 🔔      │
-└──────────────────────────┬──────────────────────────────────┘
-                           │ REST API (JSON)
-┌──────────────────────────▼──────────────────────────────────┐
-│                    BACKEND (FastAPI)                          │
-│                                                              │
-│  ┌─────────┐  ┌──────────┐  ┌────────────┐  ┌───────────┐  │
-│  │ 16 API  │→ │ Services │→ │Repositories│→ │ SQLAlchemy│  │
-│  │ Routers │  │ (Logic)  │  │ (Data)     │  │   ORM     │  │
-│  └─────────┘  └──────────┘  └────────────┘  └─────┬─────┘  │
-│                                                     │        │
-│  ┌──────────────────────────────────────────────────┤        │
-│  │         AI / INTELLIGENCE LAYER                  │        │
-│  │                                                  │        │
-│  │  ┌─────────┐  ┌──────────┐  ┌────────────────┐  │        │
-│  │  │ Agent   │→ │ 3 Agents │→ │ Groq LLM       │  │        │
-│  │  │ Router  │  │ P / C / O│  │ (llama-3.3-70b)│  │        │
-│  │  └─────────┘  └──────────┘  └────────────────┘  │        │
-│  │                                                  │        │
-│  │  ┌──────────────────────────────────────────┐    │        │
-│  │  │         RAG Pipeline                     │    │        │
-│  │  │  Upload → Extract → Chunk → TF-IDF Store │    │        │
-│  │  │  Query  → Vectorize → Cosine Sim → Top-K │    │        │
-│  │  └──────────────────────────────────────────┘    │        │
-│  │                                                  │        │
-│  │  ┌──────────────────────────────────────────┐    │        │
-│  │  │    STT Pipeline (Fully Implemented)       │    │        │
-│  │  │  Audio → Groq Whisper / faster-whisper   │    │        │
-│  │  │  Transcript → Classify → Ingest → RAG    │    │        │
-│  │  └──────────────────────────────────────────┘    │        │
-│  │                                                  │        │
-│  │  ┌──────────────────────────────────────────┐    │        │
-│  │  │    AI Draft Generator                    │    │        │
-│  │  │  9 Templates → Groq LLM → Versioned Docs│    │        │
-│  │  └──────────────────────────────────────────┘    │        │
-│  └──────────────────────────────────────────────────┘        │
-│                                                              │
-└──────────────────────────┬──────────────────────────────────┘
-                           │
-                    ┌──────▼──────┐
-                    │   SQLite    │
-                    │  (dev) /    │
-                    │ PostgreSQL  │
-                    │  (prod)     │
-                    └─────────────┘
++-------------------------------------------------------------+
+|                    FRONTEND (Next.js 16)                      |
+|  Dashboard | Issues | Citizens | Documents | Intelligence    |
+|  Schedule  | Drafts | Approvals | Geo-Analytics | Predictive |
+|  Compliance | Monitoring | Settings | Notifications          |
+|  Bhashini (Voice Intelligence / TTS / Translation)            |
++----------------------------+--------------------------------+
+                             | REST API (JSON)
++----------------------------v--------------------------------+
+|                    BACKEND (FastAPI)                          |
+|                                                              |
+|  +----------+  +----------+  +------------+  +-----------+  |
+|  | 17 API   |->| Services |->|Repositories|->| SQLAlchemy|  |
+|  | Routers  |  | (Logic)  |  | (Data)     |  |   ORM     |  |
+|  +----------+  +----------+  +------------+  +-----+-----+  |
+|                                                     |        |
+|  +--------------------------------------------------+        |
+|  |         AI / INTELLIGENCE LAYER                  |        |
+|  |                                                  |        |
+|  |  Agent Router -> 3 Agents -> Groq LLM           |        |
+|  |  RAG Pipeline: TF-IDF Vectorize -> Cosine Sim   |        |
+|  |  STT Pipeline: Groq / faster-whisper / OpenAI    |        |
+|  |  Bhashini Dhruva: ASR / TTS / NMT / Classify    |        |
+|  |  Draft Generator: 9 Templates -> LLM -> Docs    |        |
+|  +--------------------------------------------------+        |
+|                                                              |
++----------------------------+--------------------------------+
+                             |
+                      +------v------+
+                      |   SQLite    |
+                      |  (dev) /    |
+                      | PostgreSQL  |
+                      |  (prod)     |
+                      +-------------+
 ```
 
-### Backend Structure
+---
+
+## Backend Structure
 
 ```
 app/
-├── agents/           # Multi-agent framework (Policy, Citizen, Operations)
-│   ├── base.py       # BaseAgent ABC, Groq LLM client, prompt builder
-│   ├── router.py     # Intent-based keyword routing
-│   ├── policy.py     # PolicyAgent — governance, schemes, regulations
-│   ├── citizen.py    # CitizenAgent — complaints, ward analytics
-│   └── operations.py # OperationsAgent — resources, departments, KPIs
-├── api/v1/           # 16 REST API routers
-│   ├── auth.py       # JWT register/login
-│   ├── citizens.py   # CRUD + search
-│   ├── issues.py     # CRUD + filters
-│   ├── documents.py  # Upload + RAG indexing
-│   ├── dashboard.py  # Aggregated analytics
-│   ├── agent.py      # Chat + session history
-│   ├── actions.py    # HITL approval workflow
-│   ├── stt.py        # Speech-to-text (transcribe, classify, ingest)
-│   ├── notifications.py # Aggregated notification feed
-│   ├── schedule.py   # Calendar / event CRUD
-│   ├── drafts.py     # AI draft generation + management
-│   ├── sync.py       # Offline data sync
-│   ├── offline.py    # Offline queue management
-│   ├── compliance.py # Audit exports
-│   ├── monitoring.py # Health probes + metrics
-│   └── hardening.py  # Rate limit admin
-├── models/           # 9 SQLAlchemy ORM models (24+ tables)
-│   ├── user.py       # User model with roles
-│   ├── citizen.py    # Citizen records
-│   ├── issue.py      # Grievance/issue tracking
-│   ├── document.py   # Uploaded documents
-│   ├── event.py      # Schedule/calendar events
-│   └── draft.py      # AI-generated drafts
-├── schemas/          # 20+ Pydantic v2 request/response schemas
-├── repositories/     # Data access layer (query builders)
-├── services/         # Business logic layer
-│   ├── agent.py      # Orchestrates: route → RAG → execute → persist → approve
-│   ├── memory.py     # Conversation storage + TF-IDF RAG search
-│   ├── document.py   # Text extraction, chunking, Groq summarization
-│   ├── stt.py        # Multi-provider STT (Groq/local/OpenAI Whisper)
-│   ├── notification.py # Aggregation from 4 sources
-│   ├── schedule.py   # Event lifecycle management
-│   └── draft.py      # LLM-powered draft generation (9 templates)
-├── core/             # Config, DB engine, JWT security, structured logging
-├── compliance/       # Audit trail + GDPR export
-├── monitoring/       # Prometheus metrics + request logging
-├── hardening/        # Rate limiting middleware
-├── offline/          # Offline-first queue
-└── sync/             # Conflict resolution engine
+|-- agents/              # Multi-agent framework
+|   |-- base.py          # BaseAgent ABC, Groq LLM client, prompt builder
+|   |-- router.py        # Intent-based keyword routing
+|   |-- policy.py        # PolicyAgent: governance, schemes, regulations
+|   |-- citizen.py       # CitizenAgent: complaints, ward analytics
+|   +-- operations.py    # OperationsAgent: resources, departments, KPIs
+|-- api/v1/              # 17 REST API routers (82 routes)
+|   |-- auth.py          # JWT registration and login
+|   |-- citizens.py      # Citizen CRUD and search
+|   |-- issues.py        # Issue CRUD with filters
+|   |-- documents.py     # Upload with RAG indexing
+|   |-- dashboard.py     # Aggregated analytics
+|   |-- agent.py         # AI chat and session history
+|   |-- actions.py       # HITL approval workflow
+|   |-- stt.py           # Speech-to-text endpoints
+|   |-- bhashini.py      # Bhashini Dhruva API (ASR, TTS, NMT, classify, summarize)
+|   |-- notifications.py # Notification feed
+|   |-- schedule.py      # Calendar and event CRUD
+|   |-- drafts.py        # AI draft generation and management
+|   |-- sync.py          # Offline data synchronization
+|   |-- offline.py       # Offline queue management
+|   |-- compliance.py    # Audit trail exports
+|   |-- monitoring.py    # Health probes and metrics
+|   +-- hardening.py     # Rate limit administration
+|-- models/              # 9 SQLAlchemy ORM models (24+ tables)
+|   |-- user.py          # User model with role-based access
+|   |-- citizen.py       # Citizen records
+|   |-- issue.py         # Grievance and issue tracking
+|   |-- document.py      # Uploaded documents
+|   |-- event.py         # Schedule and calendar events
+|   +-- draft.py         # AI-generated drafts
+|-- schemas/             # 20+ Pydantic v2 request/response schemas
+|   +-- bhashini.py      # Bhashini API request/response models
+|-- repositories/        # Data access layer (query builders)
+|-- services/            # Business logic layer
+|   |-- agent.py         # Orchestration: route, RAG, execute, persist, approve
+|   |-- memory.py        # Conversation storage and TF-IDF RAG search
+|   |-- document.py      # Text extraction, chunking, Groq summarization
+|   |-- stt.py           # Multi-provider STT (Groq, local, OpenAI)
+|   |-- bhashini.py      # Bhashini Dhruva service (ASR, TTS, NMT, classify, summarize)
+|   |-- notification.py  # Aggregation from four data sources
+|   |-- schedule.py      # Event lifecycle management
+|   +-- draft.py         # LLM-powered draft generation (9 templates)
+|-- core/                # Configuration, database, JWT security, logging
+|-- compliance/          # Audit trail and GDPR export
+|-- monitoring/          # Prometheus metrics and request logging
+|-- hardening/           # Rate limiting middleware
+|-- offline/             # Offline-first queue
++-- sync/                # Conflict resolution engine
 ```
 
 ---
@@ -146,259 +143,313 @@ app/
 
 | Layer | Technology | Purpose |
 |---|---|---|
-| **Frontend** | Next.js 16, React 19, TypeScript 5.7 | UI framework |
-| **UI Components** | Radix UI, Tailwind CSS 4, Recharts | Accessible components + charts |
-| **Backend** | FastAPI 0.104, Python 3.13 | REST API framework |
-| **ORM** | SQLAlchemy 2.0, Alembic | Database + migrations |
-| **Database** | SQLite (dev) / PostgreSQL 16 (prod) | Persistence |
-| **LLM** | Groq SDK → Llama 3.3 70B Versatile | Agent intelligence |
-| **RAG** | scikit-learn TF-IDF + cosine similarity | Document retrieval |
-| **Doc Extraction** | PyPDF2, python-docx | PDF/DOCX text extraction |
-| **STT** | Groq Whisper + faster-whisper (local) + OpenAI Whisper | Multi-provider speech-to-text with fallback chain |
-| **Auth** | python-jose (JWT) + passlib (bcrypt) | Authentication |
-| **Logging** | structlog + JSON output | Observability |
-| **Monitoring** | Prometheus client | Metrics |
-| **Deployment** | Docker, docker-compose, Nginx | Containerization |
+| Frontend | Next.js 16, React 19, TypeScript 5.7 | UI framework |
+| UI Components | Radix UI, Tailwind CSS 4, Recharts | Accessible components and charts |
+| Backend | FastAPI 0.104, Python 3.13 | REST API framework |
+| ORM | SQLAlchemy 2.0, Alembic | Database and migrations |
+| Database | SQLite (development) / PostgreSQL 16 (production) | Persistence |
+| LLM | Groq SDK, Llama 3.3 70B Versatile | Agent intelligence and draft generation |
+| RAG | scikit-learn TF-IDF, cosine similarity | Document retrieval |
+| Document Extraction | PyPDF2, python-docx | PDF and DOCX text extraction |
+| Speech-to-Text | Groq Whisper, faster-whisper (local), OpenAI Whisper | Multi-provider STT with fallback chain |
+| Bhashini | Dhruva API (bhashini.gov.in) | Indian language ASR, TTS, neural machine translation |
+| Authentication | python-jose (JWT), passlib (bcrypt) | Token-based auth |
+| Logging | structlog, JSON output | Observability |
+| Monitoring | Prometheus client | Metrics collection |
+| Deployment | Docker, docker-compose, Nginx | Containerized deployment |
 
 ---
 
-## AI & RAG Pipeline
+## AI and Intelligence Layer
 
-### Document Ingestion
+### Document Ingestion Pipeline
 
 ```
 File Upload (.pdf/.docx/.txt)
-       │
-       ▼
-  extract_text()          ← PyPDF2 / python-docx / raw read
-       │
-       ▼
-  chunk_text()            ← 400-word chunks, 50-word overlap
-       │
-       ├──▶ generate_summary()  → Groq LLM → 2-3 sentence summary
-       │
-       ▼
-  store_embedding()       ← Each chunk → embeddings table (SHA-256 dedup)
+       |
+       v
+  extract_text()          <-- PyPDF2 / python-docx / raw read
+       |
+       v
+  chunk_text()            <-- 400-word chunks, 50-word overlap
+       |
+       +---> generate_summary()  -> Groq LLM -> 2-3 sentence summary
+       |
+       v
+  store_embedding()       <-- Each chunk stored with SHA-256 deduplication
 ```
 
-### RAG Retrieval (on user query)
+### RAG Retrieval
 
 ```
 User Query
-       │
-       ▼
-  search_by_text()        ← Load all stored chunks from DB
-       │
-       ▼
-  TfidfVectorizer         ← Build vocabulary on-the-fly
-       │
-       ▼
-  cosine_similarity()     ← Rank chunks by relevance
-       │
-       ▼
-  Top-5 chunks (score > 0.02)  → Injected into agent prompt
-       │
-       ▼
-  Groq LLM                ← Generates grounded response
+       |
+       v
+  search_by_text()        <-- Load stored chunks from database
+       |
+       v
+  TfidfVectorizer         <-- Build vocabulary on-the-fly
+       |
+       v
+  cosine_similarity()     <-- Rank chunks by relevance
+       |
+       v
+  Top-5 chunks (score > 0.02) injected into agent prompt
+       |
+       v
+  Groq LLM generates grounded response
 ```
 
-### Speech-to-Text Pipeline (Fully Implemented)
+### Speech-to-Text Pipeline
+
+The STT pipeline provides three levels of voice processing with automatic provider failover:
+
+| Endpoint | Function | Flow |
+|----------|----------|------|
+| `POST /api/v1/stt/transcribe` | Transcription only | Audio to text with language detection |
+| `POST /api/v1/stt/classify` | Transcribe and classify | Audio to text, then LLM content classification |
+| `POST /api/v1/stt/ingest` | Full pipeline | Audio to text, classify, create entity, RAG index |
+
+**Provider chain:** Groq Whisper (primary) -> local faster-whisper (offline fallback, CPU/int8) -> OpenAI Whisper (last resort)
+
+**Supported formats:** WAV, MP3, M4A, OGG, WebM, FLAC, AAC (maximum 25 MB)
+
+### Bhashini Language Services
+
+Full integration with the Bhashini Dhruva API (`dhruva-api.bhashini.gov.in`) for Indian language AI services. Supports 12+ Indian languages including Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Odia, and Urdu.
+
+| Endpoint | Function | Description |
+|----------|----------|-------------|
+| `POST /api/v1/bhashini/asr` | Speech-to-Text | Bhashini ASR for Indian languages with language selection |
+| `POST /api/v1/bhashini/tts` | Text-to-Speech | Neural TTS with male/female voice selection |
+| `POST /api/v1/bhashini/translate` | Translation | Neural machine translation between any supported language pair |
+| `POST /api/v1/bhashini/asr-translate` | ASR + Translation | Compound: transcribe audio then translate to target language |
+| `POST /api/v1/bhashini/classify-text` | Text Classification | Hybrid LLM + keyword classifier (question/issue/document) |
+| `POST /api/v1/bhashini/summarize` | Summarization | LLM-powered text summarization with key points and action items |
+| `GET /api/v1/bhashini/languages` | Supported Languages | List all supported languages per task |
+| `GET /api/v1/bhashini/health` | Health Check | Bhashini API connectivity verification |
+
+**Text Classification** uses a dual-strategy approach:
+
+1. **LLM Classification (primary):** Groq Llama 3.3 analyzes text and returns category, confidence, reasoning, and extracted metadata (department, priority, citizen name).
+2. **Keyword Classifier (fallback and cross-validator):** Rule-based classifier with 90+ Hindi and English governance keywords across three categories. Always runs alongside the LLM. If LLM confidence is below 65%, the keyword result overrides when it scores higher. On LLM failure, the keyword classifier provides immediate fallback.
+
+**Voice Intelligence Pipeline:**
 
 ```
-User speaks into microphone (🎤 button on Intelligence / Documents pages)
-       │
-       ▼
-  Audio capture (MediaRecorder API → .webm/.wav)
-       │
-       ▼
-  POST /api/v1/stt/transcribe   ← or /classify or /ingest
-       │
-       ▼
-  STT Provider Chain:
-    1. Groq Whisper (primary, fastest)
-    2. Local faster-whisper small (offline fallback, CPU/int8)
-    3. OpenAI Whisper API (last resort)
-       │
-       ▼
-  Text transcript + language detection + duration
-       │
-       ├──▶ /transcribe: Returns text only
-       ├──▶ /classify:   Transcribe → LLM classifies content type
-       └──▶ /ingest:     Transcribe → Classify → Create entity → RAG index
+Record Audio (any Indian language)
+       |
+       v
+  Bhashini ASR (language-aware)
+       |
+       v
+  Hybrid Classification (LLM + Keywords)
+       |
+       +--> "question"  -> Route to AI Agent
+       +--> "issue"     -> Create Issue (with citizen picker)
+       +--> "document"  -> Save as Document
+       |
+       v
+  Optional: Summarize (key points, action items, departments)
 ```
-
-**Supported formats:** .wav, .mp3, .m4a, .ogg, .webm, .flac, .aac (max 25 MB)
-
-The STT pipeline fully integrates with the existing RAG system — transcribed voice content enters `chunk_text()` → `store_embedding()` → `search_by_text()` making spoken content searchable alongside uploaded documents.
 
 ### AI Draft Generator
 
-```
-User selects template type (9 types available)
-       │
-       ▼
-  POST /api/v1/drafts/generate
-       │
-       ▼
-  Template system prompt selected (tone + audience placeholders)
-       │
-       ▼
-  Groq LLM (llama-3.3-70b, temperature=0.7, max_tokens=2000)
-       │
-       ▼
-  Draft created with content, word count, version=1
-       │
-       ▼
-  Edit → version auto-incremented → Submit for Review → Approve → Publish
-```
+Nine document types with specialized LLM template prompts, configurable tone and audience, and version-controlled editing:
 
-**9 Draft Types:** Speech, Official Response, Press Release, Policy Brief, Meeting Agenda, Public Notice, Formal Letter, RTI Response, Government Circular
+| Type | Description |
+|------|-------------|
+| Speech | Structured addresses with talking points (3-5 minutes) |
+| Official Response | Authoritative replies with reference numbers and timelines |
+| Press Release | Standard format with headline, dateline, lead, and boilerplate |
+| Policy Brief | Executive summary, background, findings, and recommendations |
+| Meeting Agenda | Numbered items with time allocations and responsible persons |
+| Public Notice | Compliance requirements, effective dates, and contact information |
+| Formal Letter | Indian administrative style with proper salutation and closing |
+| RTI Response | Right to Information Act 2005 compliant responses |
+| Government Circular | Internal directives with circular numbers and compliance deadlines |
+
+**Lifecycle:** Draft -> Under Review -> Approved -> Published (version auto-incremented on each content edit)
 
 ### Schedule Management
 
-```
-Leader creates event with type/priority/attendees/department
-       │
-       ▼
-  Lifecycle: Scheduled → In Progress → Completed (or Cancelled)
-       │
-       ▼
-  Smart notifications: Events within 48 hours surface in notification feed
-```
-
-**7 Event Types:** Meeting, Hearing, Site Visit, Deadline, Review, Public Event, Other
+Full calendar and event system with seven event types (Meeting, Hearing, Site Visit, Deadline, Review, Public Event, Other), three priority levels, and automatic 48-hour notification surfacing.
 
 ---
 
 ## Multi-Agent System
 
-| Agent | Handles | Example Queries |
+| Agent | Domain | Example Queries |
 |---|---|---|
-| **PolicyAgent** | Governance policies, schemes, regulations | *"What is the water supply SLA?"* |
-| **CitizenAgent** | Citizen records, complaints, ward analytics | *"Open complaints in Ward-3?"* |
-| **OperationsAgent** | Resources, departments, KPIs, scheduling | *"Allocate road repair crew"* |
+| PolicyAgent | Governance policies, schemes, regulations | "What is the water supply SLA?" |
+| CitizenAgent | Citizen records, complaints, ward analytics | "Open complaints in Ward-3?" |
+| OperationsAgent | Resources, departments, KPIs, scheduling | "Allocate road repair crew" |
 
-**Routing:** Keyword-scored intent classification → highest-scoring agent handles the query. Default fallback: CitizenAgent.
+**Routing:** Keyword-scored intent classification selects the highest-scoring agent. Default fallback: CitizenAgent.
 
-**HITL Safety:** Any agent-proposed mutation (escalate priority, allocate resources, close issue) creates an `ActionRequest` requiring human approval before execution.
+**HITL Safety:** Any agent-proposed mutation (escalate priority, allocate resources, close issue) generates an `ActionRequest` requiring human approval before execution.
 
 ---
 
-## API Endpoints
+## API Reference
+
+### Authentication
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/auth/register` | User registration |
+| POST | `/api/v1/auth/login` | JWT login |
 
 ### Core CRUD
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/health` | Health check |
-| `POST` | `/api/v1/auth/register` | User registration |
-| `POST` | `/api/v1/auth/login` | JWT login |
-| `CRUD` | `/api/v1/citizens/` | Create / List / Get / Update / Delete citizens |
-| `CRUD` | `/api/v1/issues/` | Create / List / Get / Update / Delete issues |
-| `POST` | `/api/v1/documents/upload` | Upload + RAG index document |
-| `GET` | `/api/v1/documents/` | List documents |
-| `GET` | `/api/v1/dashboard/` | Aggregated analytics |
+| GET | `/health` | Health check |
+| CRUD | `/api/v1/citizens/` | Create, list, get, update, delete citizens |
+| CRUD | `/api/v1/issues/` | Create, list, get, update, delete issues |
+| POST | `/api/v1/documents/upload` | Upload and RAG-index document |
+| GET | `/api/v1/documents/` | List documents |
+| GET | `/api/v1/dashboard/` | Aggregated analytics |
 
 ### Intelligence
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/v1/agent/query` | Send query to AI agent |
-| `GET` | `/api/v1/agent/agents` | List available agents |
-| `GET` | `/api/v1/agent/sessions/{id}` | Conversation history |
+| POST | `/api/v1/agent/query` | Submit query to AI agent |
+| GET | `/api/v1/agent/agents` | List available agents |
+| GET | `/api/v1/agent/sessions/{id}` | Retrieve conversation history |
 
-### Approvals (HITL)
+### Approvals
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/v1/actions/` | List action requests |
-| `GET` | `/api/v1/actions/pending` | Pending approvals |
-| `POST` | `/api/v1/actions/{id}/review` | Approve / reject action |
+| GET | `/api/v1/actions/` | List action requests |
+| GET | `/api/v1/actions/pending` | Pending approvals |
+| POST | `/api/v1/actions/{id}/review` | Approve or reject action |
 
 ### Speech-to-Text
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/v1/stt/transcribe` | Audio → text transcription |
-| `POST` | `/api/v1/stt/classify` | Audio → text → content classification |
-| `POST` | `/api/v1/stt/ingest` | Audio → text → classify → create entity → RAG index |
+| POST | `/api/v1/stt/transcribe` | Audio to text transcription |
+| POST | `/api/v1/stt/classify` | Audio to text with content classification |
+| POST | `/api/v1/stt/ingest` | Full pipeline: transcribe, classify, create entity, RAG index |
+
+### Bhashini Language Services
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/api/v1/bhashini/asr` | Speech-to-text for Indian languages |
+| POST | `/api/v1/bhashini/tts` | Text-to-speech with voice selection |
+| POST | `/api/v1/bhashini/translate` | Neural machine translation |
+| POST | `/api/v1/bhashini/asr-translate` | Compound ASR + translation |
+| POST | `/api/v1/bhashini/classify-text` | Hybrid LLM + keyword text classification |
+| POST | `/api/v1/bhashini/summarize` | Text summarization with key points |
+| GET | `/api/v1/bhashini/languages` | Supported languages per task |
+| GET | `/api/v1/bhashini/health` | Bhashini API connectivity check |
 
 ### Schedule Management
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/v1/schedule/` | List events (filters: status, type, department, date range) |
-| `POST` | `/api/v1/schedule/` | Create event (Leader/Staff) |
-| `GET` | `/api/v1/schedule/{id}` | Get event by ID |
-| `PATCH` | `/api/v1/schedule/{id}` | Update event |
-| `DELETE` | `/api/v1/schedule/{id}` | Delete event |
-| `GET` | `/api/v1/schedule/upcoming/list` | Upcoming events |
+| GET | `/api/v1/schedule/` | List events with filters |
+| POST | `/api/v1/schedule/` | Create event (Leader/Staff) |
+| GET | `/api/v1/schedule/{id}` | Retrieve event by ID |
+| PATCH | `/api/v1/schedule/{id}` | Update event |
+| DELETE | `/api/v1/schedule/{id}` | Delete event |
+| GET | `/api/v1/schedule/upcoming/list` | Upcoming events |
 
-### AI Draft Generator
+### Draft Generator
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/v1/drafts/generate` | Generate draft with AI (Leader/Staff) |
-| `GET` | `/api/v1/drafts/` | List drafts (filters: type, status, department) |
-| `GET` | `/api/v1/drafts/{id}` | Get draft by ID |
-| `PATCH` | `/api/v1/drafts/{id}` | Update draft (auto-increments version) |
-| `DELETE` | `/api/v1/drafts/{id}` | Delete draft |
+| POST | `/api/v1/drafts/generate` | Generate draft with AI (Leader/Staff) |
+| GET | `/api/v1/drafts/` | List drafts with filters |
+| GET | `/api/v1/drafts/{id}` | Retrieve draft by ID |
+| PATCH | `/api/v1/drafts/{id}` | Update draft (auto-increments version) |
+| DELETE | `/api/v1/drafts/{id}` | Delete draft |
 
 ### Notifications
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `GET` | `/api/v1/notifications/` | Aggregated notification feed (4 sources) |
+| GET | `/api/v1/notifications/` | Aggregated notification feed from four sources |
 
-### Platform
+### Platform Operations
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| `POST` | `/api/v1/sync/push` | Push offline data |
-| `POST` | `/api/v1/sync/pull` | Pull latest data |
-| `GET` | `/api/v1/compliance/exports` | Audit trail exports |
-| `GET` | `/api/v1/monitoring/metrics` | Prometheus metrics |
+| POST | `/api/v1/sync/push` | Push offline data |
+| POST | `/api/v1/sync/pull` | Pull latest data |
+| GET | `/api/v1/compliance/exports` | Audit trail exports |
+| GET | `/api/v1/monitoring/metrics` | Prometheus-format metrics |
 
 ---
 
-## Quick Start
+## Frontend Pages
+
+| Page | Route | Description |
+|------|-------|-------------|
+| Dashboard | `/dashboard` | Real-time KPIs, departmental analytics, charts |
+| Issues | `/issues` | Issue tracking with filters, detail modal, voice-based issue creation with Bhashini ASR and auto-translate |
+| Citizens | `/citizens` | Citizen registry with search, add, and edit |
+| Documents | `/documents` | Document upload, voice ingest with Bhashini ASR (12 languages), AI classification, and RAG indexing |
+| Intelligence | `/intelligence` | AI agent chat with document-grounded responses |
+| Bhashini | `/bhashini` | Voice Intelligence (record, classify, act), Text-to-Speech, Translation |
+| Approvals | `/approvals` | Human-in-the-loop review for AI-proposed actions |
+| Schedule | `/schedules` | Calendar view and event management |
+| Drafts | `/drafts` | AI draft generation and version-controlled editing |
+| Geo-Analytics | `/geo-analytics` | Ward-level risk heatmaps |
+| Predictive | `/predictive` | Four-week trend forecasting and anomaly detection |
+| Compliance | `/compliance` | Audit trail and export tools |
+| Monitoring | `/monitoring` | System health and performance metrics |
+| Settings | `/settings` | Application configuration |
+| Notifications | Bell icon (topbar) | Aggregated notification feed |
+
+---
+
+## Getting Started
 
 ### Prerequisites
-- Python 3.13+
-- Node.js 18+
-- Groq API key → [console.groq.com](https://console.groq.com)
 
-### Backend
+- Python 3.13 or higher
+- Node.js 18 or higher
+- Groq API key ([console.groq.com](https://console.groq.com))
+- Bhashini API key ([bhashini.gov.in](https://bhashini.gov.in)) -- for Indian language services
+
+### Backend Setup
 
 ```bash
 git clone https://github.com/Sakshamyadav15/Nayam.git
 cd Nayam
 
 python -m venv .venv
-.venv\Scripts\activate          # Windows
-# source .venv/bin/activate     # Linux/Mac
+.venv\Scripts\activate            # Windows
+# source .venv/bin/activate       # Linux / macOS
 
 pip install -r requirements.txt
 
-# Create .env with GROQ_API_KEY, JWT_SECRET_KEY, DATABASE_URL
+# Configure environment variables (.env file)
+# Required: GROQ_API_KEY, JWT_SECRET_KEY
+# Optional: BHASHINI_API_KEY (for Bhashini language services)
+
 uvicorn app.main:app --reload --port 8000
 
-# Seed data (server must be running)
-python seed_database.py         # 60 citizens, 130 issues, 5 docs
-python seed_extras.py           # Date spread + 16 action requests
-python seed_schedule_drafts.py  # 22 events + 9 AI drafts
+# Seed data (backend must be running)
+python seed_database.py           # 60 citizens, 130 issues, 5 documents
+python seed_extras.py             # Date distribution, 16 action requests
+python seed_schedule_drafts.py    # 22 events, 9 AI drafts
 ```
 
-### Frontend
+### Frontend Setup
 
 ```bash
 cd frontend
 npm install
-npm run dev                     # → http://localhost:3000
+npm run dev                       # http://localhost:3000
 ```
 
-### Default Login
+### Default Credentials
+
 ```
 Email:    admin@nayam.gov.in
 Password: admin12345
 ```
 
-### Docker
+### Docker Deployment
 
 ```bash
-docker-compose up -d            # PostgreSQL + Backend + Nginx
+docker-compose up -d              # PostgreSQL + Backend + Nginx
 ```
 
 ---
@@ -407,14 +458,16 @@ docker-compose up -d            # PostgreSQL + Backend + Nginx
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `DATABASE_URL` | `sqlite:///./nayam_dev.db` | Database URI |
-| `JWT_SECRET_KEY` | — | JWT signing secret |
-| `GROQ_API_KEY` | — | Groq LLM API key |
-| `GROQ_MODEL` | `llama-3.3-70b-versatile` | LLM model |
-| `UPLOAD_DIR` | `./uploads` | File upload path |
-| `ALLOWED_ORIGINS` | `http://localhost:3000` | CORS origins |
+| `DATABASE_URL` | `sqlite:///./nayam_dev.db` | Database connection URI |
+| `JWT_SECRET_KEY` | -- | JWT signing secret (required) |
+| `GROQ_API_KEY` | -- | Groq LLM API key (required) |
+| `GROQ_MODEL` | `llama-3.3-70b-versatile` | LLM model identifier |
+| `BHASHINI_API_KEY` | -- | Bhashini Dhruva API key (for Indian language services) |
+| `BHASHINI_INFERENCE_URL` | `https://dhruva-api.bhashini.gov.in/services/inference/pipeline` | Bhashini inference endpoint |
+| `UPLOAD_DIR` | `./uploads` | File upload storage path |
+| `ALLOWED_ORIGINS` | `http://localhost:3000` | CORS allowed origins |
 | `APP_ENV` | `development` | Environment mode |
-| `MAX_UPLOAD_SIZE_MB` | `10` | Upload size limit |
+| `MAX_UPLOAD_SIZE_MB` | `10` | Maximum upload file size |
 | `RATE_LIMIT_MAX_REQUESTS` | `100` | Rate limit per window |
 
 ---
@@ -422,27 +475,30 @@ docker-compose up -d            # PostgreSQL + Backend + Nginx
 ## Testing
 
 ```bash
-pytest -v                       # All 518 tests
-pytest tests/test_auth.py       # Auth module
-pytest tests/test_documents.py  # Document + RAG tests
-pytest tests/test_integration.py # Integration tests
+pytest -v                         # Full suite (518 tests)
+pytest tests/test_auth.py         # Authentication module
+pytest tests/test_documents.py    # Document and RAG tests
+pytest tests/test_integration.py  # Integration tests
+pytest --cov=app --cov-report=html  # Coverage report
 ```
 
 ---
 
 ## Security
 
-- **JWT Authentication** with configurable token expiry
-- **RBAC** — Leader / Staff / Analyst role hierarchy
-- **Per-IP Rate Limiting** — Sliding window with audit trail
-- **Pydantic v2 Validation** on every endpoint
-- **File Security** — Extension whitelist, size limits, UUID filenames
-- **HITL Guardrails** — AI cannot mutate state without human approval
-- **Structured Logging** — Request-ID correlation, JSON output in production
-- **No Hardcoded Secrets** — All sensitive config from environment
+| Measure | Implementation |
+|---------|---------------|
+| Authentication | JWT tokens with configurable expiry (HS256 + bcrypt) |
+| Authorization | Role-based access control: Leader, Staff, Analyst |
+| Rate Limiting | Per-IP sliding window with audit trail |
+| Input Validation | Pydantic v2 validation on every endpoint |
+| File Security | Extension whitelist, size limits, UUID filenames |
+| AI Safety | Human-in-the-loop approvals for all AI-proposed mutations |
+| Observability | Structured logging with request-ID correlation, JSON output in production |
+| Secret Management | All sensitive configuration loaded from environment variables |
 
 ---
 
 ## License
 
-Internal — Not for public distribution.
+Internal use only. Not for public distribution.

@@ -51,6 +51,10 @@ class Settings(BaseSettings):
     AGENT_MAX_CONTEXT_MESSAGES: int = 20
     ACTION_EXPIRY_HOURS: int = 24
 
+    # ── Bhashini (Gov India AI Language Services — Dhruva API) ─────
+    BHASHINI_API_KEY: str = ""           # Dhruva INFERENCE_API_KEY (Authorization header)
+    BHASHINI_INFERENCE_URL: str = "https://dhruva-api.bhashini.gov.in/services/inference/pipeline"
+
     # ── Phase 3: Predictive Governance ───────────────────────────
     RISK_COMPUTATION_INTERVAL_HOURS: int = 6
     ANOMALY_DEVIATION_THRESHOLD: float = 2.0

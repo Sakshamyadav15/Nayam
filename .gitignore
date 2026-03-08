@@ -7,7 +7,11 @@
 venv/
 .venv/
 env/
-.txt
+
+# Temporary test artifacts
+tts_output.wav
+tts_audio_base64.txt
+*.mp3
 
 # Python
 __pycache__/

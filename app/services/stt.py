@@ -211,9 +211,10 @@ def transcribe_audio(audio_path: str) -> Tuple[str, Optional[str], Optional[floa
 
     Provider selection priority:
       1. Groq Whisper API (fast, accurate, free tier) — if GROQ_API_KEY is set
-      2. LOCAL faster-whisper "small" (offline fallback)
-      3. OpenAI Whisper API — if OPENAI_API_KEY is set
-      4. Error — nothing worked
+      2. Bhashini ASR (Gov India, 22+ Indian languages) — if BHASHINI keys are set
+      3. LOCAL faster-whisper "small" (offline fallback)
+      4. OpenAI Whisper API — if OPENAI_API_KEY is set
+      5. Error — nothing worked
 
     Returns: (transcript, language, duration_seconds, provider_name)
     """
@@ -226,7 +227,18 @@ def transcribe_audio(audio_path: str) -> Tuple[str, Optional[str], Optional[floa
         except Exception as exc:
             logger.warning("Groq Whisper failed, trying next fallback: %s", exc)
 
-    # Priority 2: Local faster-whisper (offline fallback)
+    # Priority 2: Bhashini ASR (Gov India — excellent for Indian languages)
+    if settings.BHASHINI_USER_ID and settings.BHASHINI_API_KEY:
+        try:
+            from app.services.bhashini import transcribe_file_bhashini
+            transcript, lang, dur = transcribe_file_bhashini(audio_path, source_language="hi")
+            if transcript:
+                logger.info("Transcription completed via Bhashini ASR")
+                return transcript, lang, dur, "bhashini_asr"
+        except Exception as exc:
+            logger.warning("Bhashini ASR failed, trying next fallback: %s", exc)
+
+    # Priority 3: Local faster-whisper (offline fallback)
     try:
         transcript, lang, dur = transcribe_with_local_whisper(audio_path)
         if transcript:
@@ -235,7 +247,7 @@ def transcribe_audio(audio_path: str) -> Tuple[str, Optional[str], Optional[floa
     except Exception as exc:
         logger.warning("Local Whisper failed: %s", exc)
 
-    # Priority 3: OpenAI Whisper API
+    # Priority 4: OpenAI Whisper API
     if settings.OPENAI_API_KEY:
         try:
             transcript, lang, dur = transcribe_with_openai(audio_path)
