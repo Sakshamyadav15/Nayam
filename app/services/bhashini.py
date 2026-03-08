@@ -443,11 +443,21 @@ CATEGORIES:
 1. "question" — The person is asking a question or seeking information.
    Signals: questions like "what is", "how many", "show me", "tell me about", "what's the status", "kya hai", "kitne".
 
-2. "issue" — The person is reporting a citizen complaint, grievance, or service request.
-   Signals: mentions of problems, broken infrastructure, water supply, garbage, roads, "complaint", "samasyaa", "problem".
+2. "issue" — The person is reporting a citizen complaint, grievance, or active service request that needs resolution.
+   Signals: PERSONAL experience of a problem — "there is a pothole", "water not coming", "garbage not collected", broken infrastructure, active complaints.
+   KEY: The speaker is AFFECTED and wants something FIXED.
 
-3. "document" — The person is dictating a policy document, meeting minutes, field report, or any formal record.
-   Signals: formal language, "meeting", "agenda", "policy", "draft", "minutes", "inspection report".
+3. "document" — The person is dictating or describing a policy, report, meeting minutes, budget, proposal, circular, guideline, or any formal/informational record.
+   Signals: formal language, "policy", "report", "meeting", "agenda", "budget", "proposal", "draft", "minutes", "inspection", "circular", "revision", "guideline".
+   KEY: The speaker is RECORDING or DESCRIBING information, not complaining. Mentions of infrastructure topics (water, roads, electricity) in the context of policy, planning, revision, or reporting should be classified as "document", NOT "issue".
+
+IMPORTANT DISAMBIGUATION:
+- "water supply policy needs revision" → document (policy discussion, not a complaint)
+- "water supply nahi aa raha" → issue (personal complaint about lack of water)
+- "road repair report for this week" → document (a report)
+- "road has a pothole near my house" → issue (a complaint)
+- "budget proposal for infrastructure" → document (formal record)
+- "electricity nahi aa rahi 3 din se" → issue (complaint)
 
 You MUST respond with ONLY a valid JSON object:
 {
