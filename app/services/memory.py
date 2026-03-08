@@ -5,7 +5,7 @@ Business logic for the Context Memory Engine:
   • Store conversation turns
   • Generate & store embeddings (with pluggable provider)
   • Retrieve conversation context for a session
-  • Retrieve semantically similar past context via embedding search
+  • Retrieve semantically similar past context via FAISS + sentence embeddings
 """
 
 import hashlib
@@ -13,6 +13,8 @@ import logging
 from typing import List, Optional
 from uuid import UUID
 
+import faiss
+import numpy as np
 from sqlalchemy.orm import Session
 
 from app.core.config import get_settings
@@ -23,6 +25,36 @@ from app.repositories.embedding import EmbeddingRepository
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
+
+# ── Lazy-loaded Sentence Transformer ─────────────────────────────
+_sentence_model = None
+EMBEDDING_DIM = 384  # all-MiniLM-L6-v2 dimension
+
+
+def _get_sentence_model():
+    """Lazy-load the sentence-transformers model (one-time ~90 MB download)."""
+    global _sentence_model
+    if _sentence_model is None:
+        from sentence_transformers import SentenceTransformer
+        _sentence_model = SentenceTransformer("all-MiniLM-L6-v2")
+        logger.info("Loaded sentence-transformers model: all-MiniLM-L6-v2")
+    return _sentence_model
+
+
+def generate_embedding(text: str) -> List[float]:
+    """Generate a 384-dim dense embedding for the given text."""
+    model = _get_sentence_model()
+    vec = model.encode(text, normalize_embeddings=True)
+    return vec.tolist()
+
+
+def generate_embeddings_batch(texts: List[str]) -> List[List[float]]:
+    """Generate embeddings for a batch of texts (more efficient than one-by-one)."""
+    if not texts:
+        return []
+    model = _get_sentence_model()
+    vecs = model.encode(texts, normalize_embeddings=True, batch_size=64)
+    return [v.tolist() for v in vecs]
 
 
 class MemoryService:
@@ -239,10 +271,10 @@ class MemoryService:
         top_k: int = 5,
     ) -> List[dict]:
         """
-        Text-based semantic search using TF-IDF and cosine similarity.
+        Semantic search using FAISS + sentence-transformer dense embeddings.
 
-        This is the primary RAG retrieval method. It computes TF-IDF vectors
-        on the fly for all stored chunks and ranks them by relevance to the query.
+        Builds a FAISS flat-IP index over all stored embedding vectors
+        and returns the top-k most similar chunks to the query.
 
         Args:
             query: The natural language query text.
@@ -253,9 +285,6 @@ class MemoryService:
             List of dicts with keys: embedding_id, source_type,
             source_id, chunk_text, score.
         """
-        from sklearn.feature_extraction.text import TfidfVectorizer
-        from sklearn.metrics.pairwise import cosine_similarity as sklearn_cosine
-
         db_query = self.embedding_repo.db.query(Embedding)
         if source_type:
             db_query = db_query.filter(Embedding.source_type == source_type)
@@ -265,36 +294,47 @@ class MemoryService:
         if not all_embeddings:
             return []
 
-        # Build corpus: all chunk texts + the query as the last element
-        texts = [e.chunk_text for e in all_embeddings]
-        texts.append(query)
-
         try:
-            vectorizer = TfidfVectorizer(stop_words="english", max_features=5000)
-            tfidf_matrix = vectorizer.fit_transform(texts)
+            # Generate query embedding
+            query_vec = np.array(generate_embedding(query), dtype=np.float32).reshape(1, -1)
 
-            # Compare query (last vector) against all chunk vectors
-            query_vec = tfidf_matrix[-1]
-            doc_vecs = tfidf_matrix[:-1]
+            # Build FAISS index from stored embeddings
+            # Filter to only embeddings with real vectors (dim > 1)
+            valid = [(i, e) for i, e in enumerate(all_embeddings) if e.dimensions > 1]
+            if not valid:
+                # Fallback: no real embeddings, return empty
+                return []
 
-            scores = sklearn_cosine(query_vec, doc_vecs).flatten()
-            top_indices = scores.argsort()[::-1][:top_k]
+            dim = valid[0][1].dimensions
+            index = faiss.IndexFlatIP(dim)  # inner-product (embeddings are L2-normalized)
+
+            vectors = np.array(
+                [e.embedding for _, e in valid],
+                dtype=np.float32,
+            )
+            index.add(vectors)
+
+            k = min(top_k, len(valid))
+            scores, indices = index.search(query_vec, k)
 
             results = []
-            for idx in top_indices:
-                if scores[idx] > 0.02:  # minimum relevance threshold
-                    emb = all_embeddings[idx]
-                    results.append({
-                        "embedding_id": emb.id,
-                        "source_type": emb.source_type,
-                        "source_id": emb.source_id,
-                        "chunk_text": emb.chunk_text,
-                        "score": float(scores[idx]),
-                    })
+            for rank in range(k):
+                idx = int(indices[0][rank])
+                score = float(scores[0][rank])
+                if idx < 0 or score < 0.15:  # relevance threshold
+                    continue
+                emb = valid[idx][1]
+                results.append({
+                    "embedding_id": emb.id,
+                    "source_type": emb.source_type,
+                    "source_id": emb.source_id,
+                    "chunk_text": emb.chunk_text,
+                    "score": score,
+                })
 
             return results
         except Exception as exc:
-            logger.warning("TF-IDF search failed: %s", exc)
+            logger.warning("FAISS search failed: %s", exc)
             return []
 
     # ── Cleanup ──────────────────────────────────────────────────

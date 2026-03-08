@@ -54,6 +54,10 @@ python-docx==1.1.2
 # Vector math (cosine similarity in-process)
 numpy==1.26.3
 
+# Dense embeddings & FAISS vector search
+faiss-cpu==1.13.2
+sentence-transformers==5.2.3
+
 # ===================================================
 # NAYAM - Phase 3: Predictive Governance & Geo-Spatial
 # ===================================================

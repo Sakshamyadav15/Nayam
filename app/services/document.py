@@ -245,9 +245,9 @@ class DocumentService:
 
     def _store_document_embeddings(self, document: Document) -> None:
         """
-        Chunk the document text and store each chunk for RAG retrieval.
+        Chunk the document text and store each chunk with dense FAISS embeddings.
         """
-        from app.services.memory import MemoryService
+        from app.services.memory import MemoryService, generate_embeddings_batch
 
         if not document.extracted_text or document.extracted_text.startswith("["):
             return
@@ -255,14 +255,20 @@ class DocumentService:
         memory = MemoryService(self._db)
         chunks = chunk_text(document.extracted_text)
 
-        for idx, chunk in enumerate(chunks):
+        if not chunks:
+            return
+
+        # Batch-encode all chunks at once for efficiency
+        vectors = generate_embeddings_batch(chunks)
+
+        for idx, (chunk, vec) in enumerate(zip(chunks, vectors)):
             memory.store_embedding(
                 source_type="document",
                 source_id=document.id,
                 text=chunk,
-                embedding_vector=[0.0],  # placeholder — search uses TF-IDF on chunk_text
+                embedding_vector=vec,
                 chunk_index=idx,
-                model_name="tfidf-local",
+                model_name="all-MiniLM-L6-v2",
             )
 
         logger.info(

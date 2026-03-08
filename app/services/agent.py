@@ -77,7 +77,7 @@ class AgentService:
             for msg in history_records
         ]
 
-        # 3. RAG context — search embeddings by user query (text-based TF-IDF)
+        # 3. RAG context — FAISS + sentence-transformer semantic search
         rag_context: List[str] = []
         try:
             embedding_results = self._memory.search_by_text(
