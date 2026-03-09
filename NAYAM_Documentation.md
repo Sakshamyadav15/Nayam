@@ -1311,18 +1311,16 @@ An aggregated notification feed that pulls from 4 real-time data sources:
 
 ### Seed Data
 
-**`seed_database.py`** populates:
+**`seed.py`** is the single unified seed script. Run `python seed.py` (with the backend running) to populate:
 - 60 citizens across 8 wards (Ward-1 through Ward-8)
-- 130 issues across 6 departments (Water Supply, Sanitation, Roads, Electricity, Public Health, Waste Management)
-- 5 governance documents (Water Supply Policy, Sanitation Guidelines, Road Maintenance SOP, Emergency Protocol, Budget Allocation)
-
-**`seed_extras.py`** adds:
+- 130 issues across 10 departments (Water Supply, Roads & Infrastructure, Sanitation, Electricity, Public Health, Education, Housing, Revenue, Social Welfare, Transport)
+- 5 governance documents (Municipal Water Supply Policy, Ward Development Plan, Citizen Grievance Redressal Guidelines, Annual Budget Summary, Public Health Emergency Protocol)
 - Date spread: Issues distributed across 30 days (not all same timestamp)
 - 16 action requests: 8 PENDING, 5 APPROVED, 3 REJECTED
-
-**`seed_schedule_drafts.py`** adds:
 - 22 calendar events across 7 event types (meetings, hearings, site visits, deadlines, reviews, public events)
 - 9 AI-generated drafts covering all 9 template types (Speech, Official Response, Press Release, Policy Brief, Meeting Agenda, Public Notice, Formal Letter, RTI Response, Government Circular)
+
+Use `python seed.py --reset` to delete the database and start fresh.
 
 ---
 
@@ -1466,9 +1464,7 @@ npm install
 npm run dev
 
 # Seed Data
-python seed_database.py
-python seed_extras.py
-python seed_schedule_drafts.py
+python seed.py
 ```
 
 ### Docker Deployment

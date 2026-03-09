@@ -432,9 +432,7 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload --port 8000
 
 # Seed data (backend must be running)
-python seed_database.py           # 60 citizens, 130 issues, 5 documents
-python seed_extras.py             # Date distribution, 16 action requests
-python seed_schedule_drafts.py    # 22 events, 9 AI drafts
+python seed.py                    # 60 citizens, 130 issues, 5 documents, 22 events, 9 drafts, 16 action requests
 
 # Frontend (in a separate terminal)
 cd frontend
