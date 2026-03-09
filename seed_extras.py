@@ -198,8 +198,8 @@ def seed_action_requests():
 
         created = 0
         for req in requests_data:
-            action_id = str(uuid.uuid4())
-            session_id = str(uuid.uuid4())
+            action_id = uuid.uuid4().hex
+            session_id = uuid.uuid4().hex
             created_at = now - timedelta(hours=req["hours_ago"])
             reviewed_at = None
             reviewed_by = None
