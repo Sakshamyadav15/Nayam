@@ -44,5 +44,9 @@ uploads/*
 .DS_Store
 Thumbs.db
 
+# Frontend
+node_modules/
+.next/
+
 # Alembic
 alembic/versions/__pycache__/

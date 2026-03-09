@@ -22,6 +22,8 @@
 
 NAYAM is an AI-powered governance platform designed to serve as an intelligent co-pilot for municipal leaders, administrative staff, and data analysts. It provides a unified interface for managing citizens, grievances, policy documents, schedules, and administrative workflows -- backed by a multi-agent LLM system, a Retrieval-Augmented Generation (RAG) pipeline, multi-provider speech-to-text, Bhashini Gov India language services, AI-powered document drafting, and a real-time notification engine.
 
+> **Monorepo:** Backend (Python/FastAPI) and frontend (Next.js) live in a single repository. The frontend is in the `frontend/` directory.
+
 ### Key Capabilities
 
 | Capability | Description |
@@ -410,12 +412,13 @@ Full calendar and event system with seven event types (Meeting, Hearing, Site Vi
 - Groq API key ([console.groq.com](https://console.groq.com))
 - Bhashini API key ([bhashini.gov.in](https://bhashini.gov.in)) -- for Indian language services
 
-### Backend Setup
+### Setup
 
 ```bash
 git clone https://github.com/Sakshamyadav15/Nayam.git
 cd Nayam
 
+# Backend
 python -m venv .venv
 .venv\Scripts\activate            # Windows
 # source .venv/bin/activate       # Linux / macOS
@@ -432,11 +435,8 @@ uvicorn app.main:app --reload --port 8000
 python seed_database.py           # 60 citizens, 130 issues, 5 documents
 python seed_extras.py             # Date distribution, 16 action requests
 python seed_schedule_drafts.py    # 22 events, 9 AI drafts
-```
 
-### Frontend Setup
-
-```bash
+# Frontend (in a separate terminal)
 cd frontend
 npm install
 npm run dev                       # http://localhost:3000
