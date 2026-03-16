@@ -88,8 +88,8 @@ def create_app() -> FastAPI:
     ])
 
     class TrailingSlashMiddleware:
-        def __init__(self, inner_app: ASGIApp) -> None:
-            self.app = inner_app
+        def __init__(self, app: ASGIApp) -> None:
+            self.app = app
 
         async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] == "http" and scope.get("path") in _ROOT_API_PATHS:
