@@ -270,7 +270,7 @@ class TestRoleGuards:
             json={
                 "name": "Test Citizen",
                 "contact_number": "9876543210",
-                "ward": "Ward-1",
+                "ward": "Dwarka",
             },
             headers=auth_headers_analyst,
         )

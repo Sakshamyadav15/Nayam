@@ -426,7 +426,7 @@ class TestCitizenAgent:
         ctx = AgentContext(
             session_id=uuid.uuid4(),
             user_id=uuid.uuid4(),
-            query="How many complaints in Ward-5?",
+            query="How many complaints in Saket?",
         )
         resp = agent.execute(ctx)
         assert resp.agent_name == "CitizenAgent"
@@ -475,7 +475,7 @@ class TestOperationsAgent:
         ctx = AgentContext(
             session_id=uuid.uuid4(),
             user_id=uuid.uuid4(),
-            query="Reassign the sanitation team to Ward-7",
+            query="Reassign the sanitation team to Pitampura",
         )
         resp = agent.execute(ctx)
         assert len(resp.suggested_actions) == 1
@@ -515,7 +515,7 @@ class TestAgentRouter:
     def test_route_citizen_query(self) -> None:
         router = AgentRouter()
         agent, intent, conf = router.route(
-            "Show me all citizen complaints about water supply in ward 5"
+            "Show me all citizen complaints about water supply in Saket"
         )
         assert agent.name == "CitizenAgent"
 

@@ -716,7 +716,7 @@ export default function SchedulePage() {
                   type="text"
                   value={formWard}
                   onChange={(e) => setFormWard(e.target.value)}
-                  placeholder="e.g., Ward 3"
+                  placeholder="e.g., Karol Bagh"
                   className="w-full border-2 border-foreground bg-background px-3 py-2 text-sm font-medium text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 />
               </div>

@@ -166,7 +166,7 @@ def sample_citizen(db_session: Session) -> Citizen:
         id=uuid.uuid4(),
         name="Ramesh Kumar",
         contact_number="9876543210",
-        ward="Ward-5",
+        ward="Saket",
     )
     db_session.add(citizen)
     db_session.commit()
@@ -181,7 +181,7 @@ def sample_issue(db_session: Session, sample_citizen: Citizen) -> Issue:
         id=uuid.uuid4(),
         citizen_id=sample_citizen.id,
         department="Water Supply",
-        description="Irregular water supply in Ward-5 since last week.",
+        description="Irregular water supply in Saket since last week.",
         status=IssueStatus.OPEN,
         priority=IssuePriority.HIGH,
     )

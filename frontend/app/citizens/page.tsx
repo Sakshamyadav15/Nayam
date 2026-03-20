@@ -308,7 +308,7 @@ export default function CitizensPage() {
                 value={newWard}
                 onChange={(e) => setNewWard(e.target.value)}
                 className="mt-1 w-full border-2 border-foreground bg-background px-3 py-2 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
-                placeholder="e.g. Ward 1"
+                placeholder="e.g. Dwarka"
               />
             </div>
           </div>

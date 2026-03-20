@@ -287,7 +287,7 @@ Full calendar and event system with seven event types (Meeting, Hearing, Site Vi
 | Agent | Domain | Example Queries |
 |---|---|---|
 | PolicyAgent | Governance policies, schemes, regulations | "What is the water supply SLA?" |
-| CitizenAgent | Citizen records, complaints, ward analytics | "Open complaints in Ward-3?" |
+| CitizenAgent | Citizen records, complaints, ward analytics | "Open complaints in Dwarka?" |
 | OperationsAgent | Resources, departments, KPIs, scheduling | "Allocate road repair crew" |
 
 **Routing:** Keyword-scored intent classification selects the highest-scoring agent. Default fallback: CitizenAgent.

@@ -40,13 +40,13 @@ class TestRiskScoreModel:
 
     def test_create_risk_score_defaults(self, db_session: Session) -> None:
         """Creating a RiskScore with required fields populates defaults."""
-        rs = RiskScore(ward="Ward-01")
+        rs = RiskScore(ward="Dwarka")
         db_session.add(rs)
         db_session.commit()
         db_session.refresh(rs)
 
         assert rs.id is not None
-        assert rs.ward == "Ward-01"
+        assert rs.ward == "Dwarka"
         assert rs.score == 0.0
         assert rs.risk_level == RiskLevel.LOW
         assert rs.issue_count == 0
@@ -59,7 +59,7 @@ class TestRiskScoreModel:
         """Creating a RiskScore with all fields set."""
         now = datetime.now(timezone.utc)
         rs = RiskScore(
-            ward="Ward-05",
+            ward="Saket",
             department="Water Supply",
             score=78.5,
             risk_level=RiskLevel.HIGH,
@@ -73,7 +73,7 @@ class TestRiskScoreModel:
         db_session.commit()
         db_session.refresh(rs)
 
-        assert rs.ward == "Ward-05"
+        assert rs.ward == "Saket"
         assert rs.department == "Water Supply"
         assert rs.score == 78.5
         assert rs.risk_level == RiskLevel.HIGH
@@ -90,25 +90,25 @@ class TestRiskScoreModel:
         }
 
     def test_risk_score_repr(self, db_session: Session) -> None:
-        rs = RiskScore(ward="Ward-01", score=50.0, risk_level=RiskLevel.MEDIUM)
+        rs = RiskScore(ward="Dwarka", score=50.0, risk_level=RiskLevel.MEDIUM)
         db_session.add(rs)
         db_session.commit()
         db_session.refresh(rs)
         repr_str = repr(rs)
         assert "RiskScore" in repr_str
-        assert "Ward-01" in repr_str
+        assert "Dwarka" in repr_str
 
     def test_multiple_risk_scores_per_ward(self, db_session: Session) -> None:
         """Multiple risk scores can exist for the same ward (time-series)."""
         for i in range(3):
-            db_session.add(RiskScore(ward="Ward-03", score=float(i * 10)))
+            db_session.add(RiskScore(ward="Karol Bagh", score=float(i * 10)))
         db_session.commit()
 
-        results = db_session.query(RiskScore).filter_by(ward="Ward-03").all()
+        results = db_session.query(RiskScore).filter_by(ward="Karol Bagh").all()
         assert len(results) == 3
 
     def test_risk_score_critical_level(self, db_session: Session) -> None:
-        rs = RiskScore(ward="Ward-99", score=95.0, risk_level=RiskLevel.CRITICAL)
+        rs = RiskScore(ward="Model Town", score=95.0, risk_level=RiskLevel.CRITICAL)
         db_session.add(rs)
         db_session.commit()
         db_session.refresh(rs)
@@ -124,13 +124,13 @@ class TestAnomalyLogModel:
     """Tests for the AnomalyLog ORM model."""
 
     def test_create_anomaly_log_defaults(self, db_session: Session) -> None:
-        al = AnomalyLog(ward="Ward-02")
+        al = AnomalyLog(ward="Rohini")
         db_session.add(al)
         db_session.commit()
         db_session.refresh(al)
 
         assert al.id is not None
-        assert al.ward == "Ward-02"
+        assert al.ward == "Rohini"
         assert al.anomaly_type == "spike"
         assert al.severity == AnomalySeverity.WARNING
         assert al.expected_value == 0.0
@@ -141,7 +141,7 @@ class TestAnomalyLogModel:
 
     def test_create_anomaly_log_full(self, db_session: Session) -> None:
         al = AnomalyLog(
-            ward="Ward-10",
+            ward="Vikaspuri",
             department="Sanitation",
             anomaly_type="pattern_shift",
             severity=AnomalySeverity.CRITICAL,
@@ -167,14 +167,14 @@ class TestAnomalyLogModel:
         }
 
     def test_anomaly_log_repr(self, db_session: Session) -> None:
-        al = AnomalyLog(ward="Ward-02", anomaly_type="spike")
+        al = AnomalyLog(ward="Rohini", anomaly_type="spike")
         db_session.add(al)
         db_session.commit()
         db_session.refresh(al)
         assert "AnomalyLog" in repr(al)
 
     def test_anomaly_resolved_toggle(self, db_session: Session) -> None:
-        al = AnomalyLog(ward="Ward-04", resolved=0)
+        al = AnomalyLog(ward="Lajpat Nagar", resolved=0)
         db_session.add(al)
         db_session.commit()
 
@@ -202,13 +202,13 @@ class TestGeoClusterModel:
     """Tests for the GeoCluster ORM model."""
 
     def test_create_geo_cluster_defaults(self, db_session: Session) -> None:
-        gc = GeoCluster(ward="Ward-07", center_lat=28.6139, center_lng=77.2090)
+        gc = GeoCluster(ward="Pitampura", center_lat=28.6139, center_lng=77.2090)
         db_session.add(gc)
         db_session.commit()
         db_session.refresh(gc)
 
         assert gc.id is not None
-        assert gc.ward == "Ward-07"
+        assert gc.ward == "Pitampura"
         assert gc.center_lat == pytest.approx(28.6139)
         assert gc.center_lng == pytest.approx(77.2090)
         assert gc.radius_meters == 500.0
@@ -221,7 +221,7 @@ class TestGeoClusterModel:
             "coordinates": [[[77.0, 28.0], [77.1, 28.0], [77.1, 28.1], [77.0, 28.1], [77.0, 28.0]]],
         }
         gc = GeoCluster(
-            ward="Ward-08",
+            ward="Mayur Vihar",
             center_lat=28.05,
             center_lng=77.05,
             radius_meters=1200.0,
@@ -240,7 +240,7 @@ class TestGeoClusterModel:
         assert gc.density_score == pytest.approx(0.85)
 
     def test_geo_cluster_repr(self, db_session: Session) -> None:
-        gc = GeoCluster(ward="Ward-01", center_lat=0.0, center_lng=0.0)
+        gc = GeoCluster(ward="Dwarka", center_lat=0.0, center_lng=0.0)
         db_session.add(gc)
         db_session.commit()
         db_session.refresh(gc)
@@ -250,13 +250,13 @@ class TestGeoClusterModel:
         for i in range(4):
             db_session.add(
                 GeoCluster(
-                    ward="Ward-09",
+                    ward="Sadar Bazar",
                     center_lat=28.0 + i * 0.01,
                     center_lng=77.0 + i * 0.01,
                 )
             )
         db_session.commit()
-        results = db_session.query(GeoCluster).filter_by(ward="Ward-09").all()
+        results = db_session.query(GeoCluster).filter_by(ward="Sadar Bazar").all()
         assert len(results) == 4
 
 
@@ -270,7 +270,7 @@ class TestTaskRecommendationModel:
 
     def test_create_recommendation_defaults(self, db_session: Session) -> None:
         tr = TaskRecommendation(
-            ward="Ward-03",
+            ward="Karol Bagh",
             department="Electricity",
             title="Deploy additional transformer",
         )
@@ -286,7 +286,7 @@ class TestTaskRecommendationModel:
 
     def test_create_recommendation_full(self, db_session: Session) -> None:
         tr = TaskRecommendation(
-            ward="Ward-12",
+            ward="Tilak Nagar",
             department="Water Supply",
             title="Schedule pipe replacement",
             description="Aging infrastructure in sector B; leak frequency up 40%.",
@@ -346,7 +346,7 @@ class TestExecutionFeedbackModel:
 
     def _make_recommendation(self, db_session: Session) -> TaskRecommendation:
         tr = TaskRecommendation(
-            ward="Ward-01",
+            ward="Dwarka",
             department="Sanitation",
             title="Deploy additional crew",
             status=RecommendationStatus.EXECUTED,

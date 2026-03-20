@@ -428,7 +428,7 @@ class STTService:
     Full STT pipeline service: transcribe → classify → route → ingest.
 
     This service answers the core question: when someone speaks about
-    "a new water supply policy draft" vs "Ward-3 has a water pipe burst",
+    "a new water supply policy draft" vs "Karol Bagh has a water pipe burst",
     how does the system know the first is a Document and the second is an Issue?
 
     Answer: The LLM classifier examines the transcript's intent, language
@@ -545,22 +545,22 @@ class STTService:
         ┌──────────────────────────────────────────────────────────────┐
         │  HOW DIFFERENTIATION WORKS:                                  │
         │                                                              │
-        │  "We are drafting a new water supply policy for Ward-5.      │
+        │  "We are drafting a new water supply policy for Saket.      │
         │   Section 1: All households shall receive minimum 135 LPCD   │
         │   of potable water..."                                       │
         │                                                              │
         │  → LLM sees: formal language, "policy", "section",          │
         │    "shall receive" → category = POLICY_DOCUMENT              │
-        │  → Creates: Document(title="Water Supply Policy Ward-5")     │
+        │  → Creates: Document(title="Water Supply Policy Saket")     │
         │  → RAG: Chunks stored as source_type="voice_transcript"     │
         │                                                              │
         │  vs.                                                         │
         │                                                              │
-        │  "There is a major water pipe burst in Ward-3 near the       │
+        │  "There is a major water pipe burst in Karol Bagh near the       │
         │   main road. Residents are complaining about no water        │
         │   supply since yesterday morning."                           │
         │                                                              │
-        │  → LLM sees: "pipe burst", "Ward-3", "complaining",        │
+        │  → LLM sees: "pipe burst", "Karol Bagh", "complaining",        │
         │    "no water supply" → category = CITIZEN_ISSUE              │
         │  → Creates: Issue(dept="Water Supply", priority=High,        │
         │             description=<transcript>)                        │

@@ -88,8 +88,8 @@ def create_app() -> FastAPI:
     ])
 
     class TrailingSlashMiddleware:
-        def __init__(self, inner_app: ASGIApp) -> None:
-            self.app = inner_app
+        def __init__(self, app: ASGIApp) -> None:
+            self.app = app
 
         async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
             if scope["type"] == "http" and scope.get("path") in _ROOT_API_PATHS:
@@ -156,6 +156,8 @@ def create_app() -> FastAPI:
     from app.api.v1.drafts import router as drafts_router
     from app.api.v1.bhashini import router as bhashini_router
 
+    from app.api.v1.prediction import router as prediction_router
+
     app.include_router(auth_router, prefix="/api/v1/auth", tags=["Authentication"])
     app.include_router(citizens_router, prefix="/api/v1/citizens", tags=["Citizens"])
     app.include_router(issues_router, prefix="/api/v1/issues", tags=["Issues"])
@@ -173,6 +175,8 @@ def create_app() -> FastAPI:
     app.include_router(schedule_router, prefix="/api/v1/schedule", tags=["Schedule"])
     app.include_router(drafts_router, prefix="/api/v1/drafts", tags=["Drafts"])
     app.include_router(bhashini_router, prefix="/api/v1/bhashini", tags=["Bhashini"])
+
+    app.include_router(prediction_router, prefix="/api/v1/prediction", tags=["Prediction"])
 
     return app
 

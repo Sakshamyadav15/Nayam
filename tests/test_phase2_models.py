@@ -37,7 +37,7 @@ class TestConversationModel:
             session_id=session_id,
             user_id=leader_user.id,
             role=MessageRole.USER,
-            content="What is the status of Ward-5 water supply?",
+            content="What is the status of Saket water supply?",
         )
         db_session.add(msg)
         db_session.commit()
@@ -56,7 +56,7 @@ class TestConversationModel:
             session_id=session_id,
             user_id=leader_user.id,
             role=MessageRole.ASSISTANT,
-            content="Ward-5 has 3 open water supply issues.",
+            content="Saket has 3 open water supply issues.",
             agent_name="CitizenAgent",
         )
         db_session.add(msg)
@@ -326,12 +326,12 @@ class TestIssueGeoMetadata:
         issue = Issue(
             citizen_id=sample_citizen.id,
             department="Water Supply",
-            description="No water supply in Ward-5 since Monday morning",
+            description="No water supply in Saket since Monday morning",
             status=IssueStatus.OPEN,
             priority=IssuePriority.HIGH,
             latitude=28.6139,
             longitude=77.2090,
-            location_description="Near Gandhi Chowk, Ward-5",
+            location_description="Near Gandhi Chowk, Saket",
         )
         db_session.add(issue)
         db_session.commit()
@@ -339,7 +339,7 @@ class TestIssueGeoMetadata:
 
         assert issue.latitude == pytest.approx(28.6139)
         assert issue.longitude == pytest.approx(77.2090)
-        assert issue.location_description == "Near Gandhi Chowk, Ward-5"
+        assert issue.location_description == "Near Gandhi Chowk, Saket"
 
     def test_update_geo_on_existing_issue(self, db_session: Session, sample_issue: Issue):
         """Geo fields can be added to an existing issue via update."""

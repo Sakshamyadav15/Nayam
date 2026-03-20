@@ -1312,7 +1312,7 @@ An aggregated notification feed that pulls from 4 real-time data sources:
 ### Seed Data
 
 **`seed.py`** is the single unified seed script. Run `python seed.py` (with the backend running) to populate:
-- 60 citizens across 8 wards (Ward-1 through Ward-8)
+- 60 citizens across 8 wards 
 - 130 issues across 10 departments (Water Supply, Roads & Infrastructure, Sanitation, Electricity, Public Health, Education, Housing, Revenue, Social Welfare, Transport)
 - 5 governance documents (Municipal Water Supply Policy, Ward Development Plan, Citizen Grievance Redressal Guidelines, Annual Budget Summary, Public Health Emergency Protocol)
 - Date spread: Issues distributed across 30 days (not all same timestamp)

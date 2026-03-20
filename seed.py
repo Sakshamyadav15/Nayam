@@ -3,7 +3,7 @@ NAYAM (नयम्) — Unified Database Seed Script
 
 Populates the database with rich, realistic demo data in one shot:
   • Admin user (via API)
-  • 60 citizens across 8 wards (via API)
+  • 60 citizens across 8 wards(via API)
   • 130+ issues with varied statuses/priorities/departments (via API)
   • 5 governance documents with full RAG indexing (via API)
   • Date distribution: spreads issue dates across past 30 days (direct DB)
@@ -34,92 +34,115 @@ from sqlalchemy.orm import sessionmaker
 BASE = "http://localhost:8000/api/v1"
 DB_URL = "sqlite:///./nayam_dev.db"
 
-engine = create_engine(DB_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DB_URL, connect_args={"check_same_thread": False},echo=False)
 Session = sessionmaker(bind=engine)
 
 # ═══════════════════════════════════════════════════════════════════════
 # DATA DEFINITIONS
 # ═══════════════════════════════════════════════════════════════════════
 
-WARDS = ["Ward-1", "Ward-2", "Ward-3", "Ward-4", "Ward-5", "Ward-6", "Ward-7", "Ward-8"]
-
-CITIZENS = [
-    # Ward-1 (8 citizens)
-    {"name": "Aarav Sharma", "contact_number": "9876543210", "ward": "Ward-1"},
-    {"name": "Ananya Gupta", "contact_number": "9876543215", "ward": "Ward-1"},
-    {"name": "Neha Agarwal", "contact_number": "9876543225", "ward": "Ward-1"},
-    {"name": "Suresh Malhotra", "contact_number": "9876543230", "ward": "Ward-1"},
-    {"name": "Kiran Bala", "contact_number": "9876543231", "ward": "Ward-1"},
-    {"name": "Pankaj Srivastava", "contact_number": "9876543232", "ward": "Ward-1"},
-    {"name": "Rekha Jain", "contact_number": "9876543233", "ward": "Ward-1"},
-    {"name": "Vivek Kohli", "contact_number": "9876543234", "ward": "Ward-1"},
-    # Ward-2 (8 citizens)
-    {"name": "Priya Patel", "contact_number": "9876543211", "ward": "Ward-2"},
-    {"name": "Rajesh Kumar", "contact_number": "9876543216", "ward": "Ward-2"},
-    {"name": "Sita Ram", "contact_number": "9876543227", "ward": "Ward-2"},
-    {"name": "Harpreet Kaur", "contact_number": "9876543235", "ward": "Ward-2"},
-    {"name": "Mohan Lal", "contact_number": "9876543236", "ward": "Ward-2"},
-    {"name": "Anjali Saxena", "contact_number": "9876543237", "ward": "Ward-2"},
-    {"name": "Dinesh Prasad", "contact_number": "9876543238", "ward": "Ward-2"},
-    {"name": "Shobha Rani", "contact_number": "9876543239", "ward": "Ward-2"},
-    # Ward-3 (8 citizens)
-    {"name": "Rohit Verma", "contact_number": "9876543212", "ward": "Ward-3"},
-    {"name": "Meena Kumari", "contact_number": "9876543217", "ward": "Ward-3"},
-    {"name": "Manoj Dubey", "contact_number": "9876543228", "ward": "Ward-3"},
-    {"name": "Sarita Devi", "contact_number": "9876543240", "ward": "Ward-3"},
-    {"name": "Ramesh Chandra", "contact_number": "9876543241", "ward": "Ward-3"},
-    {"name": "Pooja Mishra", "contact_number": "9876543242", "ward": "Ward-3"},
-    {"name": "Anil Kumar Pal", "contact_number": "9876543243", "ward": "Ward-3"},
-    {"name": "Usha Tiwari", "contact_number": "9876543244", "ward": "Ward-3"},
-    # Ward-4 (8 citizens)
-    {"name": "Sunita Devi", "contact_number": "9876543213", "ward": "Ward-4"},
-    {"name": "Arjun Reddy", "contact_number": "9876543220", "ward": "Ward-4"},
-    {"name": "Geeta Thakur", "contact_number": "9876543229", "ward": "Ward-4"},
-    {"name": "Balram Singh", "contact_number": "9876543245", "ward": "Ward-4"},
-    {"name": "Nirmala Pathak", "contact_number": "9876543246", "ward": "Ward-4"},
-    {"name": "Yogesh Bhatt", "contact_number": "9876543247", "ward": "Ward-4"},
-    {"name": "Kamla Devi", "contact_number": "9876543248", "ward": "Ward-4"},
-    {"name": "Sunil Rawat", "contact_number": "9876543249", "ward": "Ward-4"},
-    # Ward-5 (7 citizens)
-    {"name": "Vikram Singh", "contact_number": "9876543214", "ward": "Ward-5"},
-    {"name": "Lakshmi Nair", "contact_number": "9876543221", "ward": "Ward-5"},
-    {"name": "Prakash Jha", "contact_number": "9876543250", "ward": "Ward-5"},
-    {"name": "Savitri Devi", "contact_number": "9876543251", "ward": "Ward-5"},
-    {"name": "Raghav Bansal", "contact_number": "9876543252", "ward": "Ward-5"},
-    {"name": "Padma Iyer", "contact_number": "9876543253", "ward": "Ward-5"},
-    {"name": "Arun Kapoor", "contact_number": "9876543254", "ward": "Ward-5"},
-    # Ward-6 (7 citizens)
-    {"name": "Deepak Yadav", "contact_number": "9876543218", "ward": "Ward-6"},
-    {"name": "Pooja Chauhan", "contact_number": "9876543223", "ward": "Ward-6"},
-    {"name": "Santosh Mehta", "contact_number": "9876543255", "ward": "Ward-6"},
-    {"name": "Radha Krishna", "contact_number": "9876543256", "ward": "Ward-6"},
-    {"name": "Vijay Pandey", "contact_number": "9876543257", "ward": "Ward-6"},
-    {"name": "Lata Mangeshkar", "contact_number": "9876543258", "ward": "Ward-6"},
-    {"name": "Hemant Khurana", "contact_number": "9876543259", "ward": "Ward-6"},
-    # Ward-7 (7 citizens)
-    {"name": "Kavita Mishra", "contact_number": "9876543219", "ward": "Ward-7"},
-    {"name": "Amit Tiwari", "contact_number": "9876543224", "ward": "Ward-7"},
-    {"name": "Sudha Sharma", "contact_number": "9876543260", "ward": "Ward-7"},
-    {"name": "Girish Karnad", "contact_number": "9876543261", "ward": "Ward-7"},
-    {"name": "Asha Bhonsle", "contact_number": "9876543262", "ward": "Ward-7"},
-    {"name": "Mukesh Ambani", "contact_number": "9876543263", "ward": "Ward-7"},
-    {"name": "Preeti Zinta", "contact_number": "9876543264", "ward": "Ward-7"},
-    # Ward-8 (7 citizens)
-    {"name": "Sanjay Joshi", "contact_number": "9876543222", "ward": "Ward-8"},
-    {"name": "Ravi Pandey", "contact_number": "9876543226", "ward": "Ward-8"},
-    {"name": "Nandini Verma", "contact_number": "9876543265", "ward": "Ward-8"},
-    {"name": "Sudhir Choudhary", "contact_number": "9876543266", "ward": "Ward-8"},
-    {"name": "Madhuri Dixit", "contact_number": "9876543267", "ward": "Ward-8"},
-    {"name": "Tarun Gogoi", "contact_number": "9876543268", "ward": "Ward-8"},
-    {"name": "Bhavna Solanki", "contact_number": "9876543269", "ward": "Ward-8"},
+WARDS = [
+    "Dwarka",
+    "Rohini",
+    "Karol Bagh",
+    "Lajpat Nagar",
+    "Saket",
+    "Janakpuri",
+    "Pitampura",
+    "Mayur Vihar"
 ]
+
+FIRST_NAMES = ["Aarav", "Ananya", "Rohit", "Priya", "Karan", "Neha", "Vikram", "Pooja"]
+LAST_NAMES = ["Sharma", "Gupta", "Verma", "Yadav", "Singh", "Kumar", "Mehta", "Jain"]
+
+def generate_citizens():
+    citizens = []
+    phone_base = 9876543200
+
+    for i, ward in enumerate(WARDS):
+        for j in range(8):
+            name = f"{random.choice(FIRST_NAMES)} {random.choice(LAST_NAMES)}"
+            citizens.append({
+                "name": name,
+                "contact_number": str(phone_base + i * 10 + j),
+                "ward": ward
+            })
+
+    return citizens
+
+CITIZENS = generate_citizens()
+
+WARD_CONTEXT = {
+    "Dwarka": [
+        "waterlogging in sector roads during monsoon",
+        "garbage accumulation near residential societies",
+        "parking issues in DDA apartment complexes"
+    ],
+    "Rohini": [
+        "water supply disruptions in residential sectors",
+        "overflowing garbage bins near apartments",
+        "parking shortage in densely populated blocks"
+    ],
+    "Karol Bagh": [
+        "illegal parking in commercial markets",
+        "street vendor encroachment reducing road width",
+        "sanitation issues in crowded shopping areas"
+    ],
+    "Lajpat Nagar": [
+        "sewage overflow in residential colonies",
+        "traffic congestion near central market",
+        "garbage mismanagement in busy areas"
+    ],
+    "Saket": [
+        "sewage blockage in residential blocks",
+        "water shortage complaints in apartments",
+        "waste collection delays in gated societies"
+    ],
+    "Janakpuri": [
+        "road damage in residential areas",
+        "irregular water supply in some blocks",
+        "overflowing drains during rainfall"
+    ],
+    "Pitampura": [
+        "garbage dumping in open areas",
+        "parking congestion near markets",
+        "water supply inconsistency in residential wards"
+    ],
+    "Mayur Vihar": [
+        "drain blockage leading to waterlogging",
+        "waste accumulation near housing societies",
+        "low water pressure in residential complexes"
+    ]
+}
+
+WARD_DEPT_BIAS = {
+    "Dwarka": ["Sanitation", "Water Supply"],
+    "Rohini": ["Sanitation", "Water Supply"],
+    "Karol Bagh": ["Transport", "Sanitation"],
+    "Lajpat Nagar": ["Transport", "Sanitation"],
+    "Saket": ["Water Supply", "Sanitation"],
+    "Janakpuri": ["Roads & Infrastructure", "Water Supply"],
+    "Pitampura": ["Sanitation", "Transport"],
+    "Mayur Vihar": ["Water Supply", "Sanitation"]
+}
+
+WARD_COORDS = {
+    "Dwarka": (28.5921, 77.0460),
+    "Rohini": (28.7041, 77.1025),
+    "Karol Bagh": (28.6519, 77.1909),
+    "Lajpat Nagar": (28.5677, 77.2436),
+    "Saket": (28.5245, 77.2066),
+    "Janakpuri": (28.6219, 77.0878),
+    "Pitampura": (28.6966, 77.1310),
+    "Mayur Vihar": (28.6040, 77.2977)
+}
 
 ISSUE_TEMPLATES = [
     # Water Supply (20)
     ("Broken water pipeline causing flooding on main road", "Water Supply", "High"),
     ("Drainage overflow during recent rainfall in colony area", "Water Supply", "High"),
     ("Water contamination reported in bore well supply", "Water Supply", "High"),
-    ("Fire hydrant not functional near commercial zone", "Water Supply", "High"),
+    ("Fire hydrant not functional near commercial ward", "Water Supply", "High"),
     ("Request for additional water tanker supply in summer", "Water Supply", "Low"),
     ("Low water pressure in residential apartments since 2 weeks", "Water Supply", "Medium"),
     ("Sewage mixing with drinking water in pipeline junction", "Water Supply", "High"),
@@ -137,7 +160,7 @@ ISSUE_TEMPLATES = [
     ("Water purification plant not functioning properly", "Water Supply", "High"),
     ("Stagnant water collecting near water tank breeding mosquitoes", "Water Supply", "Medium"),
     # Roads & Infrastructure (20)
-    ("Pothole on highway near school zone creating hazard", "Roads & Infrastructure", "High"),
+    ("Pothole on highway near school ward creating hazard", "Roads & Infrastructure", "High"),
     ("Road resurfacing needed after monsoon damage", "Roads & Infrastructure", "Medium"),
     ("New housing colony lacks proper road connectivity", "Roads & Infrastructure", "Medium"),
     ("Tree fell blocking road during storm", "Roads & Infrastructure", "High"),
@@ -177,7 +200,7 @@ ISSUE_TEMPLATES = [
     ("Public urination wall needs proper signage and cleaning", "Sanitation", "Low"),
     ("Composting facility at community garden not maintained", "Sanitation", "Low"),
     # Electricity (15)
-    ("Streetlights not functioning in Ward since last week", "Electricity", "Medium"),
+    ("Streetlights not functioning in ward since last week", "Electricity", "Medium"),
     ("Power outages lasting 6+ hours daily in summer", "Electricity", "High"),
     ("Solar streetlight installation request for new colony", "Electricity", "Medium"),
     ("Electric pole leaning dangerously after storm", "Electricity", "High"),
@@ -196,7 +219,7 @@ ISSUE_TEMPLATES = [
     ("Stray animal menace near marketplace area", "Public Health", "Medium"),
     ("Mosquito fogging needed to prevent dengue outbreak", "Public Health", "High"),
     ("Noise pollution from construction site at night", "Public Health", "Low"),
-    ("Food safety inspection needed at street food zone", "Public Health", "Medium"),
+    ("Food safety inspection needed at street food ward", "Public Health", "Medium"),
     ("Dengue cases rising, need vector control measures", "Public Health", "High"),
     ("Air quality deteriorating due to factory emissions", "Public Health", "High"),
     ("Stagnant water breeding grounds for malaria mosquitoes", "Public Health", "High"),
@@ -277,8 +300,8 @@ Industrial units: As per consent-to-operate conditions from State Pollution Cont
 Section 3: Infrastructure Investment
 A total budget of Rs. 180 crores has been allocated for the FY 2024-25 under the AMRUT 2.0 scheme for:
 - Replacement of aging pipeline infrastructure (Rs. 65 crores)
-- New overhead tank construction in Ward-3, Ward-5, Ward-7 (Rs. 45 crores)
-- Smart metering pilot in Ward-1 and Ward-2 (Rs. 30 crores)
+- New overhead tank construction in Dwarka, Rohini, Saket (Rs. 45 crores)
+- Smart metering pilot in Karol Bagh and Lajpat Nagar (Rs. 30 crores)
 - Water treatment plant upgradation (Rs. 40 crores)
 
 Section 4: Emergency Response
@@ -310,69 +333,69 @@ Date of Effect: 1st April 2024
 Executive Summary:
 This document outlines the comprehensive development plan for all 8 wards under the municipal corporation jurisdiction. Total planned expenditure: Rs. 320 crores across infrastructure, public health, education, and social welfare sectors.
 
-Ward-1 (Population: 45,000):
+Dwarka (Population: 72,000):
 Priority Projects:
-- Smart water metering pilot project (Rs. 15 crores) — Status: In Progress
-- Road resurfacing of 12 km stretch on MG Road (Rs. 8 crores) — Status: Tendered
-- New community health centre construction (Rs. 5 crores) — Status: Planning
-Key Issues: Water pressure complaints (High), Pothole hazards on main road (High)
-Risk Level: Medium
-
-Ward-2 (Population: 52,000):
-Priority Projects:
-- Sewage treatment plant expansion (Rs. 22 crores) — Status: Under Construction
-- Primary school renovation for 3 schools (Rs. 4 crores) — Status: In Progress
-- LED streetlight installation on all main roads (Rs. 3 crores) — Status: Completed
-Key Issues: Sewage overflow near residential areas (Critical), School building conditions (High)
+- Smart water metering in residential sectors (Rs. 17 crores) — Status: In Progress
+- Road resurfacing in Sector 6–10 corridors (Rs. 11 crores) — Status: Tendered
+- Stormwater drainage improvement (Rs. 8 crores) — Status: Planning
+Key Issues: Waterlogging during monsoons (High), Parking congestion (Medium)
 Risk Level: High
 
-Ward-3 (Population: 38,000):
+Rohini (Population: 70,000):
 Priority Projects:
-- New overhead water tank (Rs. 12 crores) — Status: Approved
-- Waste segregation processing unit (Rs. 7 crores) — Status: Planning
-- Park and recreation area development (Rs. 3 crores) — Status: Tendered
-Key Issues: Waste management concerns (Medium), Water supply intermittent (Medium)
+- Apartment water supply stabilization (Rs. 16 crores) — Status: Approved
+- Smart parking system in residential sectors (Rs. 6 crores) — Status: Procurement
+- Waste management system upgrade (Rs. 8 crores) — Status: In Progress
+Key Issues: Water supply disruption (Medium), Parking shortage (Medium)
 Risk Level: Medium
 
-Ward-4 (Population: 41,000):
+Karol Bagh (Population: 68,000):
 Priority Projects:
-- Bridge repair and strengthening (Rs. 18 crores) — Status: In Progress
-- Pension disbursement digitization (Rs. 2 crores) — Status: Testing
-- Market area pedestrianization (Rs. 6 crores) — Status: Public Consultation
-Key Issues: Bridge structural concerns (Critical), Pension delays (High)
+- Market redevelopment and pedestrianization (Rs. 14 crores) — Status: Public Consultation
+- Smart parking solutions in commercial areas (Rs. 7 crores) — Status: Procurement
+- Sanitation improvement in dense markets (Rs. 5 crores) — Status: In Progress
+Key Issues: Encroachment (High), Parking congestion (High)
 Risk Level: High
 
-Ward-5 (Population: 35,000):
+Lajpat Nagar (Population: 66,000):
 Priority Projects:
-- New overhead water tank (Rs. 14 crores) — Status: Approved
-- Traffic signal modernization (Rs. 4 crores) — Status: Procurement
-- Affordable housing 200 units (Rs. 40 crores) — Status: Land Acquired
-Key Issues: Water scarcity in summer (High), Traffic management (Medium)
-Risk Level: Medium
-
-Ward-6 (Population: 48,000):
-Priority Projects:
-- Industrial area access road (Rs. 15 crores) — Status: Under Construction
-- Community toilet complex renovation (Rs. 3 crores) — Status: Completed
-- Solar power installation on public buildings (Rs. 5 crores) — Status: In Progress
-Key Issues: Road connectivity to industrial belt (High), Power supply issues (Medium)
-Risk Level: Medium
-
-Ward-7 (Population: 42,000):
-Priority Projects:
-- Dengue prevention vector control program (Rs. 2 crores) — Status: Active
-- School computer lab modernization (Rs. 3 crores) — Status: Procurement
-- Drainage system overhaul (Rs. 10 crores) — Status: DPR Prepared
-Key Issues: Health concerns, dengue cases rising (Critical), Education infrastructure (Medium)
+- Market traffic decongestion plan (Rs. 12 crores) — Status: In Progress
+- Drainage and sewage upgrade (Rs. 9 crores) — Status: Under Construction
+- Footpath and pedestrian safety improvement (Rs. 5 crores) — Status: Approved
+Key Issues: Traffic congestion (High), Drainage overflow (Medium)
 Risk Level: High
 
-Ward-8 (Population: 36,000):
+Saket (Population: 75,000):
 Priority Projects:
-- Heritage building restoration (Rs. 8 crores) — Status: Planning
-- Bus route extension (Rs. 5 crores) — Status: Survey Complete
-- Night shelter expansion (Rs. 2 crores) — Status: Under Construction
-Key Issues: Public transport gaps (Medium), Housing for vulnerable populations (Medium)
-Risk Level: Low
+- Sewage network expansion in residential zones (Rs. 12 crores) — Status: Approved
+- Unauthorized construction monitoring system (Rs. 5 crores) — Status: In Progress
+- Water pipeline upgrade (Rs. 20 crores) — Status: Under Construction
+Key Issues: Water shortage (High), Illegal construction (High)
+Risk Level: High
+
+Janakpuri (Population: 69,000):
+Priority Projects:
+- Road repair and resurfacing (Rs. 10 crores) — Status: In Progress
+- Smart street lighting system (Rs. 6 crores) — Status: Procurement
+- Waste collection optimization project (Rs. 4 crores) — Status: Planning
+Key Issues: Road deterioration (Medium), Waste collection delays (Medium)
+Risk Level: Medium
+
+Pitampura (Population: 71,000):
+Priority Projects:
+- Drainage modernization project (Rs. 11 crores) — Status: Under Construction
+- Public park redevelopment (Rs. 7 crores) — Status: Planning
+- Traffic signal optimization system (Rs. 6 crores) — Status: Approved
+Key Issues: Waterlogging (High), Traffic congestion (Medium)
+Risk Level: High
+
+Mayur Vihar (Population: 67,000):
+Priority Projects:
+- Flood control and drainage system (Rs. 13 crores) — Status: Under Construction
+- Road and footpath repair (Rs. 9 crores) — Status: In Progress
+- Waste segregation and recycling system (Rs. 5 crores) — Status: Planning
+Key Issues: Flooding risk (High), Sanitation issues (Medium)
+Risk Level: High
 
 Budget Summary:
 Total Approved: Rs. 320 crores
@@ -441,7 +464,7 @@ YELLOW (Watch): 10% increase above seasonal baseline. Enhanced surveillance, inc
 ORANGE (Warning): 25% increase or cluster in single ward. Ward-level emergency teams, daily situation reports.
 RED (Emergency): 50% increase or multi-ward outbreak. Full EOC activation, all-department coordination, state assistance.
 
-Section 3: Dengue Protocol (Ward-7 at ORANGE)
+Section 3: Dengue Protocol (Karol Bagh at ORANGE)
 Immediate: Door-to-door larval survey | Fogging: Daily (Red), alternate days (Orange), weekly (Yellow) | Hospital: 50 dengue-ready beds | Blood bank: 200 platelet units | Free NS1 and IgM testing.
 
 Section 4: Water Contamination Timeline
@@ -458,24 +481,24 @@ Review Frequency: Monthly (normal), Weekly (elevated), Daily (emergency)
 
 ACTION_REQUESTS = [
     # Pending (8)
-    {"agent_name": "PolicyAgent", "action_type": "escalate_priority", "desc_tpl": "ISS-{iid}: Escalate priority of water contamination issue in Ward-1 to Critical — multiple citizen complaints received. {extra}", "status": "PENDING", "hours_ago": 2},
+    {"agent_name": "PolicyAgent", "action_type": "escalate_priority", "desc_tpl": "ISS-{iid}: Escalate priority of water contamination issue in Dwarka to Critical — multiple citizen complaints received. {extra}", "status": "PENDING", "hours_ago": 2},
     {"agent_name": "CitizenAgent", "action_type": "assign_department", "desc_tpl": "ISS-{iid}: Reassign road pothole issue from Roads & Infrastructure to Emergency Services — structural risk detected. {extra}", "status": "PENDING", "hours_ago": 4},
-    {"agent_name": "OperationsAgent", "action_type": "allocate_resources", "desc_tpl": "ISS-{iid}: Allocate 3 additional water tankers to Ward-3 — supply deficit detected by AI analysis. Estimated cost: Rs. 15,000/day.", "status": "PENDING", "hours_ago": 5},
-    {"agent_name": "PolicyAgent", "action_type": "issue_advisory", "desc_tpl": "ISS-{iid}: Issue public health advisory for Ward-7 — dengue case clustering detected. Recommend fogging operation within 24 hours.", "status": "PENDING", "hours_ago": 6},
+    {"agent_name": "OperationsAgent", "action_type": "allocate_resources", "desc_tpl": "ISS-{iid}: Allocate 3 additional water tankers to Karol Bagh — supply deficit detected by AI analysis. Estimated cost: Rs. 15,000/day.", "status": "PENDING", "hours_ago": 5},
+    {"agent_name": "PolicyAgent", "action_type": "issue_advisory", "desc_tpl": "ISS-{iid}: Issue public health advisory for Pitampura — dengue case clustering detected. Recommend fogging operation within 24 hours.", "status": "PENDING", "hours_ago": 6},
     {"agent_name": "OperationsAgent", "action_type": "schedule_maintenance", "desc_tpl": "ISS-{iid}: Schedule emergency road repair on Highway-12 near school zone — AI risk assessment: 87% accident probability if unaddressed.", "status": "PENDING", "hours_ago": 8},
-    {"agent_name": "CitizenAgent", "action_type": "send_notification", "desc_tpl": "ISS-{iid}: Send SMS alert to 340 affected residents in Ward-5 about scheduled water supply interruption (maintenance). Duration: 8 hours.", "status": "PENDING", "hours_ago": 10},
-    {"agent_name": "PolicyAgent", "action_type": "update_policy", "desc_tpl": "ISS-{iid}: Update sanitation collection schedule for Ward-2 — AI detected 3-day gap in waste pickup causing complaints spike.", "status": "PENDING", "hours_ago": 12},
-    {"agent_name": "OperationsAgent", "action_type": "deploy_team", "desc_tpl": "ISS-{iid}: Deploy vector control team to Ward-6 — predictive model forecasts 40% increase in mosquito-borne illness within 2 weeks.", "status": "PENDING", "hours_ago": 14},
+    {"agent_name": "CitizenAgent", "action_type": "send_notification", "desc_tpl": "ISS-{iid}: Send SMS alert to 340 affected residents in Saket about scheduled water supply interruption (maintenance). Duration: 8 hours.", "status": "PENDING", "hours_ago": 10},
+    {"agent_name": "PolicyAgent", "action_type": "update_policy", "desc_tpl": "ISS-{iid}: Update sanitation collection schedule for Rohini — AI detected 3-day gap in waste pickup causing complaints spike.", "status": "PENDING", "hours_ago": 12},
+    {"agent_name": "OperationsAgent", "action_type": "deploy_team", "desc_tpl": "ISS-{iid}: Deploy vector control team to Janakpuri — predictive model forecasts 40% increase in mosquito-borne illness within 2 weeks.", "status": "PENDING", "hours_ago": 14},
     # Approved (5)
-    {"agent_name": "PolicyAgent", "action_type": "escalate_priority", "desc_tpl": "ISS-{iid}: Escalated streetlight outage in Ward-4 from Medium to High — safety concern near school. Approved by admin.", "status": "APPROVED", "hours_ago": 24},
-    {"agent_name": "OperationsAgent", "action_type": "allocate_resources", "desc_tpl": "ISS-{iid}: Allocated emergency repair crew for burst water main in Ward-1. 4 workers deployed within 2 hours.", "status": "APPROVED", "hours_ago": 36},
-    {"agent_name": "CitizenAgent", "action_type": "send_notification", "desc_tpl": "ISS-{iid}: Sent automated status update to 12 complainants about road repair progress in Ward-3. Estimated completion: 5 days.", "status": "APPROVED", "hours_ago": 48},
-    {"agent_name": "PolicyAgent", "action_type": "close_issue", "desc_tpl": "ISS-{iid}: Auto-closed resolved garbage collection issue in Ward-8 — no complaints for 7 days. AI confidence: 94%.", "status": "APPROVED", "hours_ago": 72},
-    {"agent_name": "OperationsAgent", "action_type": "schedule_maintenance", "desc_tpl": "ISS-{iid}: Scheduled transformer inspection in Ward-2 after AI detected voltage fluctuation pattern. Maintenance window: Sunday 6AM-12PM.", "status": "APPROVED", "hours_ago": 96},
+    {"agent_name": "PolicyAgent", "action_type": "escalate_priority", "desc_tpl": "ISS-{iid}: Escalated streetlight outage in Lajpat Nagar from Medium to High — safety concern near school. Approved by admin.", "status": "APPROVED", "hours_ago": 24},
+    {"agent_name": "OperationsAgent", "action_type": "allocate_resources", "desc_tpl": "ISS-{iid}: Allocated emergency repair crew for burst water main in Dwarka. 4 workers deployed within 2 hours.", "status": "APPROVED", "hours_ago": 36},
+    {"agent_name": "CitizenAgent", "action_type": "send_notification", "desc_tpl": "ISS-{iid}: Sent automated status update to 12 complainants about road repair progress in Karol Bagh. Estimated completion: 5 days.", "status": "APPROVED", "hours_ago": 48},
+    {"agent_name": "PolicyAgent", "action_type": "close_issue", "desc_tpl": "ISS-{iid}: Auto-closed resolved garbage collection issue in Mayur Vihar — no complaints for 7 days. AI confidence: 94%.", "status": "APPROVED", "hours_ago": 72},
+    {"agent_name": "OperationsAgent", "action_type": "schedule_maintenance", "desc_tpl": "ISS-{iid}: Scheduled transformer inspection in Rohini after AI detected voltage fluctuation pattern. Maintenance window: Sunday 6AM-12PM.", "status": "APPROVED", "hours_ago": 96},
     # Rejected (3)
     {"agent_name": "PolicyAgent", "action_type": "reallocate_budget", "desc_tpl": "ISS-{iid}: AI suggested reallocating Rs. 5 lakhs from Education budget to Emergency Road Repair. Rejected — education funds are ring-fenced.", "status": "REJECTED", "hours_ago": 50},
     {"agent_name": "CitizenAgent", "action_type": "auto_close_issue", "desc_tpl": "ISS-{iid}: AI suggested auto-closing pension delay complaint. Rejected — issue still active, citizen confirmed non-resolution.", "status": "REJECTED", "hours_ago": 60},
-    {"agent_name": "OperationsAgent", "action_type": "reduce_frequency", "desc_tpl": "ISS-{iid}: AI suggested reducing fogging frequency in Ward-5 from daily to weekly. Rejected — dengue cases still rising.", "status": "REJECTED", "hours_ago": 80},
+    {"agent_name": "OperationsAgent", "action_type": "reduce_frequency", "desc_tpl": "ISS-{iid}: AI suggested reducing fogging frequency in Saket from daily to weekly. Rejected — dengue cases still rising.", "status": "REJECTED", "hours_ago": 80},
 ]
 
 
@@ -494,12 +517,12 @@ On this 80th Independence Day, as we hoist our Tricolour, I am reminded of the i
 Over the past twelve months, our administration has:
 
 1. **Resolved 847 citizen grievances** through the NAYAM governance platform -- a 40% improvement over last year.
-2. **Completed 12 infrastructure projects** including the Gandhi Nagar bridge, Ward 3 drainage overhaul, and the new community health center.
+2. **Completed 12 infrastructure projects** including the Gandhi Nagar bridge, Karol Bagh drainage overhaul, and the new community health center.
 3. **Digitized 95% of land records**, making them accessible to citizens online within minutes.
 
 ## Challenges Ahead
 
-We must honestly acknowledge the work that remains. Water supply irregularities in Wards 4 and 6, the pending market construction in Ward 7, and the need for better sanitation coverage demand our urgent attention.
+We must honestly acknowledge the work that remains. Water supply irregularities in Lajpat Nagar and Janakpuri, the pending market construction in Pitampura, and the need for better sanitation coverage demand our urgent attention.
 
 ## Our Commitment
 
@@ -516,11 +539,11 @@ RESPONSE_CONTENT = """# Official Response
 
 **Reference:** WS/2026/0342
 **Date:** 28 February 2026
-**Subject:** Irregular Water Supply in Sector 12, Ward 4
+**Subject:** Irregular Water Supply in Sector 12, Lajpat Nagar
 
 Dear Residents of Sector 12,
 
-This is in response to your collective representation dated 20 February 2026 regarding irregular water supply in Sector 12, Ward 4.
+This is in response to your collective representation dated 20 February 2026 regarding irregular water supply in Sector 12, Lajpat Nagar.
 
 The Water Supply Department has investigated the matter and identified two root causes:
 
@@ -581,7 +604,7 @@ Traditionally, government response to civic issues has been reactive. NAYAM anal
 3. **Full Rollout** -- Implement across all wards with monthly review cycles
 
 ## Recommendation
-Option 2 (Pilot Program) is recommended with Ward 3, Ward 4, and Ward 7 as pilot locations based on current risk metrics from NAYAM dashboard."""
+Option 2 (Pilot Program) is recommended with Karol Bagh, Lajpat Nagar, and Pitampura as pilot locations based on current risk metrics from NAYAM dashboard."""
 
 MEETING_AGENDA_CONTENT = """# Ward Development Committee Meeting Agenda
 
@@ -595,12 +618,12 @@ MEETING_AGENDA_CONTENT = """# Ward Development Committee Meeting Agenda
 ## 2. Approval of Previous Minutes (10:10 - 10:20)
 ## 3. Road Repair Budget Review (10:20 - 10:50)
 - Current allocation: Rs 12.5 Lakhs | Expenditure: Rs 8.3 Lakhs (66.4%)
-- Pending works: Ward 2 internal roads, Ward 5 NH-44 access road
+- Pending works: Rohini internal roads, Saket NH-44 access road
 - **Decision needed:** Supplementary allocation request of Rs 4 Lakhs
 
 ## 4. Drainage Status Update (10:50 - 11:20)
-- Ward 3 main drain desilting: 85% complete
-- Ward 4 Sector 12 waterlogging: New pipeline approved
+- Karol Bagh main drain desilting: 85% complete
+- Lajpat Nagar Sector 12 waterlogging: New pipeline approved
 
 ## 5. Citizen Grievance Review (11:20 - 11:50)
 - Total pending: 23 (down from 41) | High-priority: 5
@@ -612,11 +635,11 @@ MEETING_AGENDA_CONTENT = """# Ward Development Committee Meeting Agenda
 
 PUBLIC_NOTICE_CONTENT = """# PUBLIC NOTICE
 
-## Regarding: Road Closure for Resurfacing Work — Main Market Road, Ward 3
+## Regarding: Road Closure for Resurfacing Work — Main Market Road, Karol Bagh
 
 **Notice No.:** PWD/2026/RC-045 | **Date:** 3 March 2026
 
-Main Market Road in Ward 3 will remain closed for vehicular traffic from 4 March 2026 to 7 March 2026 due to road resurfacing work.
+Main Market Road in Karol Bagh will remain closed for vehicular traffic from 4 March 2026 to 7 March 2026 due to road resurfacing work.
 
 ### Alternative Routes:
 1. Light vehicles: Use Nehru Marg via Sector 4 crossing
@@ -633,7 +656,7 @@ FORMAL_LETTER_CONTENT = """# OFFICE OF THE DISTRICT MAGISTRATE
 
 To: The Chief Engineer, State Water Supply & Sewerage Board
 
-**Subject: Urgent Request for Emergency Pipeline Replacement — Sector 12, Ward 4**
+**Subject: Urgent Request for Emergency Pipeline Replacement — Sector 12, Lajpat Nagar**
 
 The main water supply pipeline serving Sector 12 (installed 2008) has deteriorated beyond repair. Over 3 months: 14 major leakages, supply reduced to 2 hours/day, 342 complaints, emergency tanker at Rs 15,000/day.
 
@@ -645,9 +668,9 @@ RTI_RESPONSE_CONTENT = """# RIGHT TO INFORMATION ACT, 2005 — Response
 
 **RTI Ref:** RTI/2026/0117 | **Application:** 15 Feb 2026 | **Response:** 3 Mar 2026
 
-**Subject:** Road construction contracts in Ward 5
+**Subject:** Road construction contracts in Saket
 
-**Q1:** Total contracts awarded in Ward 5 FY 2025-26? **A1:** 7 contracts.
+**Q1:** Total contracts awarded in Saket FY 2025-26? **A1:** 7 contracts.
 **Q2:** Contractors and values? **A2:** ABC Constructions Rs 8.5L, XYZ Infra Rs 12.3L, PQR Builders Rs 6.75L, LMN Associates Rs 3.2L, DEF Contractors Rs 4.5L, GHI Works Rs 9.8L, JKL Infrastructure Rs 5.6L.
 **Q3:** Completion status? **A3:** 4 completed, 2 in progress, 1 not started.
 **Q4:** Quality inspection reports? **A4:** Copies enclosed (47 pages).
@@ -682,6 +705,25 @@ GOVT_CIRCULAR_CONTENT = """# GOVERNMENT CIRCULAR
 # ═══════════════════════════════════════════════════════════════════════
 # SEED FUNCTIONS
 # ═══════════════════════════════════════════════════════════════════════
+
+def clear_tables():
+    print("\n[0/5] Clearing existing data...")
+
+    db = Session()
+    try:
+        # Order matters (foreign keys)
+        db.execute(text("DELETE FROM action_requests"))
+        db.execute(text("DELETE FROM issues"))
+        db.execute(text("DELETE FROM citizens"))
+        db.execute(text("DELETE FROM documents"))
+        db.execute(text("DELETE FROM events"))
+        db.execute(text("DELETE FROM drafts"))
+        db.execute(text("DELETE FROM embeddings"))
+
+        db.commit()
+        print("  ✓ Cleared old data")
+    finally:
+        db.close()
 
 def step1_api_seed(base_url: str):
     """Seed citizens, issues, and documents via the REST API (requires running backend)."""
@@ -741,12 +783,37 @@ def step1_api_seed(base_url: str):
     issue_created = issue_failed = 0
     status_choices = ["Open", "Open", "Open", "In Progress", "In Progress", "Closed"]
     for desc, dept, priority in ISSUE_TEMPLATES:
+        ward = random.choice(WARDS)
+
+        # Department bias
+        if random.random() < 0.7:
+            dept = random.choice(WARD_DEPT_BIAS.get(ward, [dept]))
+
+        context = random.choice(WARD_CONTEXT[ward])
+
+        # Priority realism
+        priority_weights = {
+            "Water Supply": ["High", "High", "Medium"],
+            "Sanitation": ["High", "Medium", "Medium"],
+            "Transport": ["High", "Medium"],
+            "Electricity": ["High", "Medium"],
+        }
+        priority = random.choice(priority_weights.get(dept, ["Medium", "Low"]))
+
         payload = {
             "citizen_id": random.choice(citizen_ids),
             "department": dept,
-            "description": desc,
+            "description": f"{desc} reported in {context}, {ward}.",
             "priority": priority,
+            "location_description": context
         }
+
+        # OPTIONAL GEO
+        if ward in WARD_COORDS:
+            lat, lng = WARD_COORDS[ward]
+            payload["latitude"] = lat + random.uniform(-0.01, 0.01)
+            payload["longitude"] = lng + random.uniform(-0.01, 0.01)
+
         resp = requests.post(f"{base_url}/issues/", json=payload, headers=headers)
         if resp.status_code == 201:
             issue_created += 1
@@ -839,7 +906,8 @@ def step3_action_requests():
         for i, req in enumerate(ACTION_REQUESTS):
             iid = issue_ids[i % len(issue_ids)][0][:8]
             extra = issue_ids[i % len(issue_ids)][1][:60]
-            desc = req["desc_tpl"].format(iid=iid, extra=extra)
+            ward = random.choice(WARDS)
+            desc = req["desc_tpl"].format(iid=iid, extra=f"{extra} in {ward}")
             created_at = now - timedelta(hours=req["hours_ago"])
             reviewed_at = reviewed_by = review_note = None
 
@@ -890,29 +958,29 @@ def step4_events_and_drafts():
     # ── Events (22 total) ────────────────────────────────────────
     events_data = [
         # From seed_schedule_drafts.py (10)
-        dict(title="Ward Development Committee Meeting", description="Monthly review of ongoing projects in Wards 1-5. Road repair budget, drainage status, citizen grievances.", event_type=EventType.MEETING, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=1,hours=2), end_time=now+timedelta(days=1,hours=4), location="Municipal Hall, Room 201", attendees="DM Singh, SDO Verma, Ward Members 1-5", department="Public Works", ward="Ward 3", created_by=uid),
-        dict(title="Water Supply Review", description="Review water distribution schedule and address citizen complaints.", event_type=EventType.REVIEW, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=2,hours=3), end_time=now+timedelta(days=2,hours=5), location="Water Department Office", attendees="JE Water Supply, Ward Engineers", department="Water Supply Department", ward="Ward 4", created_by=uid),
-        dict(title="Public Hearing - New Market Construction", description="Public hearing for proposed commercial market in Ward 7.", event_type=EventType.HEARING, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=3,hours=1), end_time=now+timedelta(days=3,hours=3), location="Community Center, Ward 7", attendees="Public, Ward Councillor, Revenue Officer", department="Revenue Department", ward="Ward 7", created_by=uid),
-        dict(title="Bridge Construction Site Visit", description="Inspection of under-construction bridge near Gandhi Nagar.", event_type=EventType.SITE_VISIT, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=4), end_time=now+timedelta(days=4,hours=2), location="Gandhi Nagar Bridge Site", attendees="Executive Engineer, Contractor Rep", department="Public Works", ward="Ward 2", created_by=uid),
+        dict(title="Ward Development Committee Meeting", description="Monthly review of ongoing projects in Wards 1-5. Road repair budget, drainage status, citizen grievances.", event_type=EventType.MEETING, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=1,hours=2), end_time=now+timedelta(days=1,hours=4), location="Municipal Hall, Room 201", attendees="DM Singh, SDO Verma, Ward Members 1-5", department="Public Works", ward="Karol Bagh", created_by=uid),
+        dict(title="Water Supply Review", description="Review water distribution schedule and address citizen complaints.", event_type=EventType.REVIEW, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=2,hours=3), end_time=now+timedelta(days=2,hours=5), location="Water Department Office", attendees="JE Water Supply, Ward Engineers", department="Water Supply Department", ward="Lajpat Nagar", created_by=uid),
+        dict(title="Public Hearing - New Market Construction", description="Public hearing for proposed commercial market in Pitampura.", event_type=EventType.HEARING, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=3,hours=1), end_time=now+timedelta(days=3,hours=3), location="Community Center, Pitampura", attendees="Public, Ward Councillor, Revenue Officer", department="Revenue Department", ward="Pitampura", created_by=uid),
+        dict(title="Bridge Construction Site Visit", description="Inspection of under-construction bridge near Gandhi Nagar.", event_type=EventType.SITE_VISIT, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=4), end_time=now+timedelta(days=4,hours=2), location="Gandhi Nagar Bridge Site", attendees="Executive Engineer, Contractor Rep", department="Public Works", ward="Rohini", created_by=uid),
         dict(title="Budget Submission Deadline", description="Final date for departmental budget proposals FY 2026-27.", event_type=EventType.DEADLINE, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=5), end_time=now+timedelta(days=5,hours=1), location="Online Portal", attendees="All Department Heads", department="Finance Department", is_all_day=True, created_by=uid),
         dict(title="Independence Day Celebration Planning", description="Plan cultural programs, security, VIP seating for 15 August.", event_type=EventType.PUBLIC_EVENT, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=7,hours=2), end_time=now+timedelta(days=7,hours=4), location="District Stadium", attendees="Cultural Officer, Police SP, Protocol Officer", department="General Administration", created_by=uid),
-        dict(title="Sanitation Drive - Ward 1", description="Mega cleanliness campaign. Deploy 3 teams.", event_type=EventType.PUBLIC_EVENT, status=EventStatus.SCHEDULED, priority=EventPriority.LOW, start_time=now+timedelta(days=6,hours=1), end_time=now+timedelta(days=6,hours=6), location="Ward 1 - All sectors", attendees="Sanitation Inspector, 30 field workers", department="Sanitation Department", ward="Ward 1", created_by=uid),
+        dict(title="Sanitation Drive - Dwarka", description="Mega cleanliness campaign. Deploy 3 teams.", event_type=EventType.PUBLIC_EVENT, status=EventStatus.SCHEDULED, priority=EventPriority.LOW, start_time=now+timedelta(days=6,hours=1), end_time=now+timedelta(days=6,hours=6), location="Dwarka - All sectors", attendees="Sanitation Inspector, 30 field workers", department="Sanitation Department", ward="Dwarka", created_by=uid),
         dict(title="Staff Performance Review", description="Quarterly KPI review for administrative staff.", event_type=EventType.REVIEW, status=EventStatus.SCHEDULED, priority=EventPriority.LOW, start_time=now+timedelta(days=8,hours=3), end_time=now+timedelta(days=8,hours=5), location="Conference Room B", attendees="HR Head, Section Officers", department="General Administration", created_by=uid),
-        dict(title="Road Repair Inspection (completed)", description="Final inspection of NH-44 pothole repair completed.", event_type=EventType.SITE_VISIT, status=EventStatus.COMPLETED, priority=EventPriority.HIGH, start_time=now-timedelta(days=2,hours=3), end_time=now-timedelta(days=2,hours=1), location="NH-44 Km 23-25", attendees="PWD Engineer, Contractor", department="Public Works", ward="Ward 5", created_by=uid),
+        dict(title="Road Repair Inspection (completed)", description="Final inspection of NH-44 pothole repair completed.", event_type=EventType.SITE_VISIT, status=EventStatus.COMPLETED, priority=EventPriority.HIGH, start_time=now-timedelta(days=2,hours=3), end_time=now-timedelta(days=2,hours=1), location="NH-44 Km 23-25", attendees="PWD Engineer, Contractor", department="Public Works", ward="Saket", created_by=uid),
         dict(title="Monsoon Preparedness Meeting (completed)", description="Pre-monsoon planning. All departments briefed.", event_type=EventType.MEETING, status=EventStatus.COMPLETED, priority=EventPriority.HIGH, start_time=now-timedelta(days=5,hours=4), end_time=now-timedelta(days=5,hours=2), location="Collectorate Conference Hall", attendees="All Department Heads", department="Disaster Management", created_by=uid),
         # From seed_more_data.py (12)
-        dict(title="RTI Response Deadline - Case 2026/117", description="Final date to respond to RTI on road construction contracts in Ward 5.", event_type=EventType.DEADLINE, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=2,hours=5), end_time=now+timedelta(days=2,hours=6), location="RTI Cell, Collectorate", attendees="PIO, APIO, Legal Advisor", department="General Administration", ward="Ward 5", created_by=uid),
-        dict(title="Gram Sabha - Ward 6", description="Quarterly Gram Sabha: MGNREGA review, BPL list, road repair priorities.", event_type=EventType.MEETING, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=3,hours=2), end_time=now+timedelta(days=3,hours=5), location="Panchayat Bhawan, Ward 6", attendees="Sarpanch, Gram Sachiv, Ward Members, Citizens", department="Panchayati Raj", ward="Ward 6", created_by=uid),
-        dict(title="Electricity Department Coordination", description="Coordinate transformer replacement for Wards 2 and 3.", event_type=EventType.MEETING, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=1,hours=5), end_time=now+timedelta(days=1,hours=7), location="SDM Office", attendees="SDM, XEN Electricity, JE Ward 2, JE Ward 3", department="Electricity Department", ward="Ward 2", created_by=uid),
-        dict(title="School Building Safety Inspection", description="Annual structural safety audit of government schools in Wards 1-3.", event_type=EventType.SITE_VISIT, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=5,hours=1), end_time=now+timedelta(days=5,hours=6), location="Govt. Primary School, Ward 1", attendees="BEO, PWD Engineer, School Principals", department="Education Department", ward="Ward 1", created_by=uid),
+        dict(title="RTI Response Deadline - Case 2026/117", description="Final date to respond to RTI on road construction contracts in Saket.", event_type=EventType.DEADLINE, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=2,hours=5), end_time=now+timedelta(days=2,hours=6), location="RTI Cell, Collectorate", attendees="PIO, APIO, Legal Advisor", department="General Administration", ward="Saket", created_by=uid),
+        dict(title="Gram Sabha - Janakpuri", description="Quarterly Gram Sabha: MGNREGA review, BPL list, road repair priorities.", event_type=EventType.MEETING, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=3,hours=2), end_time=now+timedelta(days=3,hours=5), location="Panchayat Bhawan, Janakpuri", attendees="Sarpanch, Gram Sachiv, Ward Members, Citizens", department="Panchayati Raj", ward="Janakpuri", created_by=uid),
+        dict(title="Electricity Department Coordination", description="Coordinate transformer replacement for Wards 2 and 3.", event_type=EventType.MEETING, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=1,hours=5), end_time=now+timedelta(days=1,hours=7), location="SDM Office", attendees="SDM, XEN Electricity, JE Rohini, JE Karol Bagh", department="Electricity Department", ward="Rohini", created_by=uid),
+        dict(title="School Building Safety Inspection", description="Annual structural safety audit of government schools in Wards 1-3.", event_type=EventType.SITE_VISIT, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=5,hours=1), end_time=now+timedelta(days=5,hours=6), location="Govt. Primary School, Dwarka", attendees="BEO, PWD Engineer, School Principals", department="Education Department", ward="Dwarka", created_by=uid),
         dict(title="Weekly Law & Order Review", description="Weekly review with police on law and order, pending cases, festival security.", event_type=EventType.REVIEW, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=1), end_time=now+timedelta(days=1,hours=1), location="SP Office", attendees="DM, SP, DSP, SHOs", department="Police", created_by=uid),
-        dict(title="Ration Distribution Drive - Ward 4", description="Special ration for 200 flood-affected families in Sector 8.", event_type=EventType.PUBLIC_EVENT, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=2,hours=1), end_time=now+timedelta(days=2,hours=8), location="Community Hall, Sector 8, Ward 4", attendees="Supply Inspector, 10 Volunteers, Ward Councillor", department="Food & Civil Supplies", ward="Ward 4", created_by=uid),
+        dict(title="Ration Distribution Drive - Lajpat Nagar", description="Special ration for 200 flood-affected families in Sector 8.", event_type=EventType.PUBLIC_EVENT, status=EventStatus.SCHEDULED, priority=EventPriority.HIGH, start_time=now+timedelta(days=2,hours=1), end_time=now+timedelta(days=2,hours=8), location="Community Hall, Sector 8, Lajpat Nagar", attendees="Supply Inspector, 10 Volunteers, Ward Councillor", department="Food & Civil Supplies", ward="Lajpat Nagar", created_by=uid),
         dict(title="Vaccination Camp Planning", description="Plan pulse polio and routine immunization camp across all wards.", event_type=EventType.MEETING, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=9,hours=3), end_time=now+timedelta(days=9,hours=5), location="CMO Office", attendees="CMO, PHC Doctors, ASHA Workers Coordinator", department="Health Department", created_by=uid),
-        dict(title="Revenue Court Hearing - Land Dispute", description="Hearing for land dispute case No. 45/2025 in Ward 7.", event_type=EventType.HEARING, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=4,hours=3), end_time=now+timedelta(days=4,hours=5), location="Revenue Court, Tehsil Office", attendees="SDM (Presiding), Patwari, Both Parties", department="Revenue Department", ward="Ward 7", created_by=uid),
+        dict(title="Revenue Court Hearing - Land Dispute", description="Hearing for land dispute case No. 45/2025 in Pitampura.", event_type=EventType.HEARING, status=EventStatus.SCHEDULED, priority=EventPriority.MEDIUM, start_time=now+timedelta(days=4,hours=3), end_time=now+timedelta(days=4,hours=5), location="Revenue Court, Tehsil Office", attendees="SDM (Presiding), Patwari, Both Parties", department="Revenue Department", ward="Pitampura", created_by=uid),
         dict(title="CANCELLED: Contractor Meeting (postponed)", description="Road contractors for NH-44 widening postponed due to state review.", event_type=EventType.MEETING, status=EventStatus.CANCELLED, priority=EventPriority.MEDIUM, start_time=now-timedelta(days=1,hours=2), end_time=now-timedelta(days=1), location="PWD Office", attendees="EE PWD, Contractors", department="Public Works", created_by=uid),
-        dict(title="Completed: Flood Damage Assessment - Ward 4", description="47 houses partially damaged, 8 fully damaged. Report submitted.", event_type=EventType.SITE_VISIT, status=EventStatus.COMPLETED, priority=EventPriority.HIGH, start_time=now-timedelta(days=3,hours=5), end_time=now-timedelta(days=3,hours=1), location="Ward 4, Sectors 6-9", attendees="Tehsildar, Patwari, Revenue Inspector", department="Revenue Department", ward="Ward 4", created_by=uid),
+        dict(title="Completed: Flood Damage Assessment - Lajpat Nagar", description="47 houses partially damaged, 8 fully damaged. Report submitted.", event_type=EventType.SITE_VISIT, status=EventStatus.COMPLETED, priority=EventPriority.HIGH, start_time=now-timedelta(days=3,hours=5), end_time=now-timedelta(days=3,hours=1), location="Lajpat Nagar, Sectors 6-9", attendees="Tehsildar, Patwari, Revenue Inspector", department="Revenue Department", ward="Lajpat Nagar", created_by=uid),
         dict(title="Completed: District Development Committee", description="Quarterly DDC: approved 5 new projects, reviewed 12 schemes.", event_type=EventType.MEETING, status=EventStatus.COMPLETED, priority=EventPriority.HIGH, start_time=now-timedelta(days=7,hours=4), end_time=now-timedelta(days=7,hours=1), location="Collectorate Conference Hall", attendees="DM, CDO, All BDOs, MPs/MLAs Representatives", department="Planning Department", created_by=uid),
-        dict(title="IN PROGRESS: Road Resurfacing - Ward 3", description="Road resurfacing on Main Market Road, Ward 3. Completion: 3 days.", event_type=EventType.SITE_VISIT, status=EventStatus.IN_PROGRESS, priority=EventPriority.MEDIUM, start_time=now-timedelta(hours=6), end_time=now+timedelta(days=3), location="Main Market Road, Ward 3", attendees="JE PWD, Contractor Foreman", department="Public Works", ward="Ward 3", created_by=uid),
+        dict(title="IN PROGRESS: Road Resurfacing - Karol Bagh", description="Road resurfacing on Main Market Road, Karol Bagh. Completion: 3 days.", event_type=EventType.SITE_VISIT, status=EventStatus.IN_PROGRESS, priority=EventPriority.MEDIUM, start_time=now-timedelta(hours=6), end_time=now+timedelta(days=3), location="Main Market Road, Karol Bagh", attendees="JE PWD, Contractor Foreman", department="Public Works", ward="Karol Bagh", created_by=uid),
     ]
 
     for ed in events_data:
@@ -923,13 +991,13 @@ def step4_events_and_drafts():
     # ── Drafts (9 total) ─────────────────────────────────────────
     drafts_data = [
         dict(title="Speech: Independence Day Address 2026", draft_type=DraftType.SPEECH, status=DraftStatus.DRAFT, content=SPEECH_CONTENT, prompt_context="Independence Day speech highlighting district achievements", tone="Formal", audience="Citizens, Officials, Media", department="General Administration", version=1, extra_metadata={"word_count": 210, "ai_generated": False}, created_by=uid),
-        dict(title="Official Response: Water Supply Complaint - Ward 4", draft_type=DraftType.OFFICIAL_RESPONSE, status=DraftStatus.APPROVED, content=RESPONSE_CONTENT, prompt_context="Response to water supply complaints from Ward 4 residents", tone="Empathetic", audience="Ward 4 Residents", department="Water Supply Department", version=2, extra_metadata={"word_count": 185, "ai_generated": True}, created_by=uid),
+        dict(title="Official Response: Water Supply Complaint - Lajpat Nagar", draft_type=DraftType.OFFICIAL_RESPONSE, status=DraftStatus.APPROVED, content=RESPONSE_CONTENT, prompt_context="Response to water supply complaints from Lajpat Nagar residents", tone="Empathetic", audience="Lajpat Nagar Residents", department="Water Supply Department", version=2, extra_metadata={"word_count": 185, "ai_generated": True}, created_by=uid),
         dict(title="Press Release: NAYAM AI Governance Platform Launch", draft_type=DraftType.PRESS_RELEASE, status=DraftStatus.PUBLISHED, content=PRESS_CONTENT, prompt_context="Press release for NAYAM platform launch", tone="Professional", audience="Media, General Public", department="General Administration", version=1, extra_metadata={"word_count": 195, "ai_generated": True}, created_by=uid),
         dict(title="Policy Brief: Ward-Level Predictive Risk Scoring", draft_type=DraftType.POLICY_BRIEF, status=DraftStatus.UNDER_REVIEW, content=POLICY_CONTENT, prompt_context="Policy brief on AI predictive analytics for ward risk management", tone="Analytical", audience="Senior Administration, Policy Committee", department="Planning Department", version=1, extra_metadata={"word_count": 190, "ai_generated": True}, created_by=uid),
         dict(title="Meeting Agenda: Ward Development Committee - 5 March", draft_type=DraftType.MEETING_AGENDA, status=DraftStatus.APPROVED, content=MEETING_AGENDA_CONTENT, prompt_context="Monthly ward development committee meeting agenda", tone="Professional", audience="Ward Committee Members, Department Officers", department="General Administration", version=1, extra_metadata={"word_count": 280, "ai_generated": True}, created_by=uid),
-        dict(title="Public Notice: Road Closure - Ward 3 Main Market Road", draft_type=DraftType.PUBLIC_NOTICE, status=DraftStatus.PUBLISHED, content=PUBLIC_NOTICE_CONTENT, prompt_context="Road closure notice for resurfacing work", tone="Informative", audience="General Public, Commuters", department="Public Works", version=1, extra_metadata={"word_count": 220, "ai_generated": True}, created_by=uid),
+        dict(title="Public Notice: Road Closure - Karol Bagh Main Market Road", draft_type=DraftType.PUBLIC_NOTICE, status=DraftStatus.PUBLISHED, content=PUBLIC_NOTICE_CONTENT, prompt_context="Road closure notice for resurfacing work", tone="Informative", audience="General Public, Commuters", department="Public Works", version=1, extra_metadata={"word_count": 220, "ai_generated": True}, created_by=uid),
         dict(title="Formal Letter: Emergency Pipeline Replacement Request", draft_type=DraftType.LETTER, status=DraftStatus.UNDER_REVIEW, content=FORMAL_LETTER_CONTENT, prompt_context="Letter to State Water Board for emergency pipeline replacement", tone="Formal", audience="State Government Officials", department="Water Supply Department", version=2, extra_metadata={"word_count": 260, "ai_generated": True}, created_by=uid),
-        dict(title="RTI Response: Road Construction Contracts - Ward 5", draft_type=DraftType.RTI_RESPONSE, status=DraftStatus.APPROVED, content=RTI_RESPONSE_CONTENT, prompt_context="RTI response about road contracts in Ward 5", tone="Formal", audience="RTI Applicant", department="General Administration", version=1, extra_metadata={"word_count": 320, "ai_generated": False}, created_by=uid),
+        dict(title="RTI Response: Road Construction Contracts - Saket", draft_type=DraftType.RTI_RESPONSE, status=DraftStatus.APPROVED, content=RTI_RESPONSE_CONTENT, prompt_context="RTI response about road contracts in Saket", tone="Formal", audience="RTI Applicant", department="General Administration", version=1, extra_metadata={"word_count": 320, "ai_generated": False}, created_by=uid),
         dict(title="Government Circular: NAYAM Platform Mandatory Adoption", draft_type=DraftType.CIRCULAR, status=DraftStatus.PUBLISHED, content=GOVT_CIRCULAR_CONTENT, prompt_context="Circular for mandatory NAYAM platform adoption", tone="Authoritative", audience="Department Heads, All Officers", department="General Administration", version=1, extra_metadata={"word_count": 350, "ai_generated": True}, created_by=uid),
     ]
 
@@ -960,6 +1028,7 @@ def main():
             sys.exit(0)
 
     print()
+    clear_tables()
     step1_api_seed(BASE)
     step2_spread_dates()
     step3_action_requests()

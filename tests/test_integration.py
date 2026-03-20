@@ -44,7 +44,7 @@ class TestIntegrationAuthAndData:
         # Step 2: Create citizen
         citizen_resp = client.post(
             "/api/v1/citizens/",
-            json={"name": "Integration Citizen", "contact_number": "9988776655", "ward": "Ward-7"},
+            json={"name": "Integration Citizen", "contact_number": "9988776655", "ward": "Pitampura"},
             headers=headers,
         )
         assert citizen_resp.status_code == 201
@@ -88,7 +88,7 @@ class TestIntegrationAuthAndData:
         # Cannot create citizen
         assert client.post(
             "/api/v1/citizens/",
-            json={"name": "Should Fail", "contact_number": "0000000000", "ward": "Ward-1"},
+            json={"name": "Should Fail", "contact_number": "0000000000", "ward": "Dwarka"},
             headers=headers,
         ).status_code == 403
 
@@ -205,7 +205,7 @@ class TestFullGovernanceWorkflow:
             json={
                 "name": "E2E Citizen Ravi",
                 "contact_number": "9112233445",
-                "ward": "Ward-12",
+                "ward": "Vikaspuri",
             },
             headers=headers,
         )

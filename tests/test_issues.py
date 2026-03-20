@@ -30,7 +30,7 @@ class TestCreateIssue:
             json={
                 "citizen_id": str(sample_citizen.id),
                 "department": "Road & Transport",
-                "description": "Pothole on main road near Ward-5 bus stop causing accidents.",
+                "description": "Pothole on main road near Saket bus stop causing accidents.",
                 "priority": "High",
             },
             headers=auth_headers_leader,
@@ -83,7 +83,7 @@ class TestCreateIssue:
             json={
                 "citizen_id": str(sample_citizen.id),
                 "department": "Education",
-                "description": "School building needs repair in Ward-5 area urgently.",
+                "description": "School building needs repair in Saket area urgently.",
             },
             headers=auth_headers_staff,
         )

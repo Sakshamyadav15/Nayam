@@ -298,8 +298,8 @@ export default function DashboardPage() {
               { action: "ISS-003 escalated to critical", time: "2 min ago", type: "alert" },
               { action: "APR-005 approved by Commissioner", time: "15 min ago", type: "approval" },
               { action: "New document uploaded: Water Audit", time: "32 min ago", type: "document" },
-              { action: "Ward 12 risk score updated: 78", time: "1 hr ago", type: "update" },
-              { action: "AI prediction: Ward 3 risk rising", time: "1.5 hr ago", type: "ai" },
+              { action: "Tilak Nagar risk score updated: 78", time: "1 hr ago", type: "update" },
+              { action: "AI prediction: Karol Bagh risk rising", time: "1.5 hr ago", type: "ai" },
               { action: "Citizen record CIT-004 modified", time: "2 hr ago", type: "update" },
               { action: "Weekly compliance report generated", time: "3 hr ago", type: "system" },
             ].map((item, i) => (

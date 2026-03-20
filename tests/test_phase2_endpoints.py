@@ -69,7 +69,7 @@ class TestAgentQueryEndpoint:
     ) -> None:
         resp = client.post(
             "/api/v1/agent/query",
-            json={"query": "Show citizen complaints in ward 5"},
+            json={"query": "Show citizen complaints in Saket"},
             headers=auth_headers_staff,
         )
         assert resp.status_code == 200
@@ -445,7 +445,7 @@ class TestE2EAgentToApproval:
         # Turn 2 — same session
         client.post(
             "/api/v1/agent/query",
-            json={"query": "citizen complaints in ward 5", "session_id": sid},
+            json={"query": "citizen complaints in Saket", "session_id": sid},
             headers=auth_headers_leader,
         )
 

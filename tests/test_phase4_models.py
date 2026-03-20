@@ -61,7 +61,7 @@ class TestSyncQueueModel:
             operation=SyncOperation.UPDATE,
             resource_type="citizen",
             resource_id=res_id,
-            payload={"name": "Updated Name", "ward": "Ward-05"},
+            payload={"name": "Updated Name", "ward": "Saket"},
             version=3,
             status=SyncStatus.IN_PROGRESS,
             priority=1,
@@ -315,7 +315,7 @@ class TestOfflineActionModel:
             action_type="update_citizen",
             resource_type="citizen",
             resource_id=res_id,
-            payload={"name": "Jane Doe", "ward": "Ward-10"},
+            payload={"name": "Jane Doe", "ward": "Vikaspuri"},
             checksum="sha256hex",
         )
         db_session.add(oa)
@@ -324,7 +324,7 @@ class TestOfflineActionModel:
 
         assert oa.user_id == user_id
         assert oa.resource_id == res_id
-        assert oa.payload["ward"] == "Ward-10"
+        assert oa.payload["ward"] == "Vikaspuri"
 
     def test_offline_status_enum(self) -> None:
         assert set(OfflineStatus) == {
@@ -404,7 +404,7 @@ class TestComplianceExportModel:
             report_type="access_log",
             export_format=ExportFormat.CSV,
             status=ExportStatus.COMPLETED,
-            parameters={"ward": "Ward-03", "from": "2026-01-01"},
+            parameters={"ward": "Karol Bagh", "from": "2026-01-01"},
             record_count=1500,
             file_path="./exports/access_log_2026.csv",
             file_size_bytes=204800,
@@ -417,7 +417,7 @@ class TestComplianceExportModel:
         assert ce.export_format == ExportFormat.CSV
         assert ce.status == ExportStatus.COMPLETED
         assert ce.record_count == 1500
-        assert ce.parameters["ward"] == "Ward-03"
+        assert ce.parameters["ward"] == "Karol Bagh"
 
     def test_export_format_enum(self) -> None:
         assert set(ExportFormat) == {ExportFormat.PDF, ExportFormat.CSV, ExportFormat.JSON}

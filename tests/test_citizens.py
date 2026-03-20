@@ -33,14 +33,14 @@ class TestCreateCitizen:
             json={
                 "name": "Suresh Patel",
                 "contact_number": "9876543210",
-                "ward": "Ward-3",
+                "ward": "Karol Bagh",
             },
             headers=auth_headers_leader,
         )
         assert response.status_code == 201
         data = response.json()
         assert data["name"] == "Suresh Patel"
-        assert data["ward"] == "Ward-3"
+        assert data["ward"] == "Karol Bagh"
         assert "id" in data
 
     def test_create_citizen_as_staff(
@@ -52,7 +52,7 @@ class TestCreateCitizen:
             json={
                 "name": "Meena Sharma",
                 "contact_number": "8765432109",
-                "ward": "Ward-1",
+                "ward": "Dwarka",
             },
             headers=auth_headers_staff,
         )
@@ -66,7 +66,7 @@ class TestCreateCitizen:
             "/api/v1/citizens/",
             json={
                 "contact_number": "9876543210",
-                "ward": "Ward-3",
+                "ward": "Karol Bagh",
             },
             headers=auth_headers_leader,
         )
@@ -81,7 +81,7 @@ class TestCreateCitizen:
             json={
                 "name": "A",
                 "contact_number": "9876543210",
-                "ward": "Ward-3",
+                "ward": "Karol Bagh",
             },
             headers=auth_headers_leader,
         )
@@ -202,13 +202,13 @@ class TestUpdateCitizen:
         """Updating a citizen should reflect the changes."""
         response = client.put(
             f"/api/v1/citizens/{sample_citizen.id}",
-            json={"name": "Updated Name", "ward": "Ward-10"},
+            json={"name": "Updated Name", "ward": "Vikaspuri"},
             headers=auth_headers_leader,
         )
         assert response.status_code == 200
         data = response.json()
         assert data["name"] == "Updated Name"
-        assert data["ward"] == "Ward-10"
+        assert data["ward"] == "Vikaspuri"
 
     def test_partial_update_citizen(
         self, client: TestClient, auth_headers_staff: dict, sample_citizen: Citizen
@@ -216,11 +216,11 @@ class TestUpdateCitizen:
         """Partial update (only ward) should work."""
         response = client.put(
             f"/api/v1/citizens/{sample_citizen.id}",
-            json={"ward": "Ward-99"},
+            json={"ward": "Model Town"},
             headers=auth_headers_staff,
         )
         assert response.status_code == 200
-        assert response.json()["ward"] == "Ward-99"
+        assert response.json()["ward"] == "Model Town"
         assert response.json()["name"] == sample_citizen.name  # unchanged
 
     def test_update_nonexistent_citizen(
